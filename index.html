@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="mobile-web-app-capable" content="yes">
     <title>Abhyudaya | Premium Educational Excellence</title>
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -24,13 +23,6 @@
                         secondary: '#1a1a1a',
                         accent: '#ff3e00',
                         gold: '#d4af37',
-                    },
-                    screens: {
-                        'xs': '375px',
-                        'sm': '640px',
-                        'md': '768px',
-                        'lg': '1024px',
-                        'xl': '1280px',
                     }
                 }
             }
@@ -50,9 +42,7 @@
         @media (pointer: coarse) {
             .cursor, .cursor-follower { display: none; }
             body { cursor: auto; }
-            .magnetic-btn { cursor: pointer; }
         }
-
         @media (pointer: fine) {
             body { cursor: none; }
         }
@@ -66,7 +56,7 @@
             position: fixed;
             pointer-events: none;
             z-index: 9999;
-            transition: transform 0.15s, opacity 0.15s;
+            transition: transform 0.15s;
             mix-blend-mode: difference;
         }
         .cursor-follower {
@@ -79,61 +69,228 @@
             z-index: 9998;
             transition: transform 0.4s ease-out;
         }
-        .cursor.hover {
-            transform: scale(2);
-            background: rgba(255, 62, 0, 0.2);
-        }
-        .cursor-follower.hover {
-            transform: scale(1.5);
-        }
+        .cursor.hover { transform: scale(2); background: rgba(255, 62, 0, 0.2); }
+        .cursor-follower.hover { transform: scale(1.5); }
 
         /* Noise Texture */
         .noise {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            inset: 0;
             pointer-events: none;
             z-index: 9000;
             opacity: 0.03;
             background-image: url("image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
         }
 
-        /* Gradient Mesh Background - Optimized for mobile */
+        /* Enhanced Gradient Mesh Background */
         .gradient-mesh {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            z-index: -1;
+            inset: 0;
+            z-index: -2;
             background: 
-                radial-gradient(at 0% 0%, rgba(255, 62, 0, 0.15) 0px, transparent 50%),
-                radial-gradient(at 100% 0%, rgba(212, 175, 55, 0.1) 0px, transparent 50%),
-                radial-gradient(at 100% 100%, rgba(255, 62, 0, 0.1) 0px, transparent 50%),
-                radial-gradient(at 0% 100%, rgba(212, 175, 55, 0.15) 0px, transparent 50%);
-            filter: blur(80px);
+                radial-gradient(at 0% 0%, rgba(255, 62, 0, 0.25) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(212, 175, 55, 0.2) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(255, 62, 0, 0.2) 0px, transparent 50%),
+                radial-gradient(at 0% 100%, rgba(212, 175, 55, 0.25) 0px, transparent 50%),
+                radial-gradient(at 50% 50%, rgba(255, 100, 50, 0.15) 0px, transparent 60%);
+            filter: blur(100px);
             animation: meshMove 20s ease-in-out infinite;
         }
-
         @media (max-width: 768px) {
-            .gradient-mesh {
-                filter: blur(40px);
+            .gradient-mesh { 
+                filter: blur(60px); 
                 animation: none;
                 background: 
-                    radial-gradient(at 0% 0%, rgba(255, 62, 0, 0.1) 0px, transparent 50%),
-                    radial-gradient(at 100% 100%, rgba(212, 175, 55, 0.1) 0px, transparent 50%);
+                    radial-gradient(at 0% 0%, rgba(255, 62, 0, 0.15) 0px, transparent 50%),
+                    radial-gradient(at 100% 100%, rgba(212, 175, 55, 0.15) 0px, transparent 50%);
             }
         }
-
         @keyframes meshMove {
             0%, 100% { transform: translate(0, 0) scale(1); }
             33% { transform: translate(30px, -30px) scale(1.1); }
             66% { transform: translate(-20px, 20px) scale(0.9); }
         }
 
-        /* Magnetic Button - Touch optimized */
+        /* Animated Grid Pattern */
+        .grid-pattern {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            opacity: 0.4;
+            animation: gridMove 20s linear infinite;
+        }
+        @media (max-width: 768px) {
+            .grid-pattern { 
+                display: none;
+            }
+        }
+        @keyframes gridMove {
+            0% { transform: perspective(500px) rotateX(60deg) translateY(0); }
+            100% { transform: perspective(500px) rotateX(60deg) translateY(50px); }
+        }
+
+        /* Floating Orbs */
+        .orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.4;
+            z-index: -1;
+            pointer-events: none;
+        }
+        .orb-1 {
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(255, 62, 0, 0.4) 0%, transparent 70%);
+            top: 10%;
+            left: -10%;
+            animation: orbFloat1 15s ease-in-out infinite;
+        }
+        .orb-2 {
+            width: 350px;
+            height: 350px;
+            background: radial-gradient(circle, rgba(212, 175, 55, 0.3) 0%, transparent 70%);
+            top: 60%;
+            right: -5%;
+            animation: orbFloat2 18s ease-in-out infinite;
+            animation-delay: -5s;
+        }
+        .orb-3 {
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(255, 100, 50, 0.3) 0%, transparent 70%);
+            bottom: 10%;
+            left: 30%;
+            animation: orbFloat3 20s ease-in-out infinite;
+            animation-delay: -10s;
+        }
+        .orb-4 {
+            width: 250px;
+            height: 250px;
+            background: radial-gradient(circle, rgba(212, 175, 55, 0.25) 0%, transparent 70%);
+            top: 30%;
+            right: 20%;
+            animation: orbFloat4 16s ease-in-out infinite;
+            animation-delay: -3s;
+        }
+        @media (max-width: 768px) {
+            .orb { display: none; }
+        }
+        @keyframes orbFloat1 {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(50px, 50px) scale(1.1); }
+        }
+        @keyframes orbFloat2 {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(-40px, -40px) scale(0.9); }
+        }
+        @keyframes orbFloat3 {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(30px, -50px) scale(1.05); }
+        }
+        @keyframes orbFloat4 {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(-30px, 40px) scale(0.95); }
+        }
+
+        /* Geometric Shapes */
+        .geo-shape {
+            position: fixed;
+            opacity: 0.05;
+            z-index: -1;
+            pointer-events: none;
+        }
+        .geo-1 {
+            top: 20%;
+            left: 10%;
+            width: 200px;
+            height: 200px;
+            border: 2px solid #ff3e00;
+            transform: rotate(45deg);
+            animation: geoRotate1 30s linear infinite;
+        }
+        .geo-2 {
+            bottom: 20%;
+            right: 15%;
+            width: 150px;
+            height: 150px;
+            border: 2px solid #d4af37;
+            border-radius: 50%;
+            animation: geoRotate2 25s linear infinite reverse;
+        }
+        .geo-3 {
+            top: 50%;
+            left: 50%;
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, rgba(255,62,0,0.1), rgba(212,175,55,0.1));
+            clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+            animation: geoPulse 10s ease-in-out infinite;
+        }
+        @media (max-width: 768px) {
+            .geo-shape { display: none; }
+        }
+        @keyframes geoRotate1 {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        @keyframes geoRotate2 {
+            from { transform: rotate(360deg); }
+            to { transform: rotate(0deg); }
+        }
+        @keyframes geoPulse {
+            0%, 100% { transform: scale(1) rotate(0deg); opacity: 0.05; }
+            50% { transform: scale(1.2) rotate(180deg); opacity: 0.1; }
+        }
+
+        /* Aurora Effect */
+        .aurora {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.3;
+            background: 
+                radial-gradient(ellipse at 20% 20%, rgba(255, 62, 0, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(212, 175, 55, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(255, 100, 50, 0.1) 0%, transparent 60%);
+            filter: blur(60px);
+            animation: auroraMove 25s ease-in-out infinite;
+        }
+        @media (max-width: 768px) {
+            .aurora { display: none; }
+        }
+        @keyframes auroraMove {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(-20px, -30px) scale(1.1); }
+            66% { transform: translate(30px, 20px) scale(0.95); }
+        }
+
+        /* Glowing Dots Pattern */
+        .dots-pattern {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            background-image: radial-gradient(rgba(255, 62, 0, 0.15) 1px, transparent 1px);
+            background-size: 30px 30px;
+            opacity: 0.3;
+            animation: dotsPulse 8s ease-in-out infinite;
+        }
+        @media (max-width: 768px) {
+            .dots-pattern { display: none; }
+        }
+        @keyframes dotsPulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Magnetic Button */
         .magnetic-btn {
             position: relative;
             display: inline-flex;
@@ -145,13 +302,11 @@
             font-weight: 700;
             border-radius: 100px;
             overflow: hidden;
-            transition: transform 0.3s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.3s;
+            transition: transform 0.3s cubic-bezier(0.23, 1, 0.32, 1);
             border: none;
             touch-action: manipulation;
         }
-        @media (pointer: fine) {
-            .magnetic-btn { cursor: none; }
-        }
+        @media (pointer: fine) { .magnetic-btn { cursor: none; } }
         .magnetic-btn::before {
             content: '';
             position: absolute;
@@ -160,17 +315,9 @@
             opacity: 0;
             transition: opacity 0.3s;
         }
-        .magnetic-btn:active::before {
-            opacity: 1;
-        }
-        .magnetic-btn span {
-            position: relative;
-            z-index: 1;
-            pointer-events: none;
-        }
-        .magnetic-btn:active {
-            transform: scale(0.95);
-        }
+        .magnetic-btn:active::before { opacity: 1; }
+        .magnetic-btn span { position: relative; z-index: 1; pointer-events: none; }
+        .magnetic-btn:active { transform: scale(0.95); }
 
         /* Text Reveal Animation */
         .reveal-text {
@@ -182,25 +329,16 @@
             opacity: 0;
             transition: transform 0.8s cubic-bezier(0.23, 1, 0.32, 1), opacity 0.8s;
         }
-        .reveal-text.active .char {
-            transform: translateY(0);
-            opacity: 1;
-        }
+        .reveal-text.active .char { transform: translateY(0); opacity: 1; }
 
-        /* 3D Card Effect - Disabled on mobile for performance */
+        /* 3D Card Effect */
         .card-3d {
             transform-style: preserve-3d;
             transform: perspective(1000px);
             transition: transform 0.3s;
         }
-        @media (max-width: 768px) {
-            .card-3d {
-                transform: none;
-            }
-        }
-        .card-3d-content {
-            transform: translateZ(50px);
-        }
+        @media (max-width: 768px) { .card-3d { transform: none; } }
+        .card-3d-content { transform: translateZ(50px); }
         .card-3d::before {
             content: '';
             position: absolute;
@@ -213,9 +351,7 @@
             filter: blur(20px);
         }
         @media (min-width: 769px) {
-            .card-3d:hover::before {
-                opacity: 0.5;
-            }
+            .card-3d:hover::before { opacity: 0.5; }
         }
 
         /* Scroll Progress */
@@ -230,14 +366,9 @@
             transform: scaleX(0);
         }
 
-        /* Floating Elements - Reduced on mobile */
+        /* Floating Elements */
         .float-element {
             animation: float 6s ease-in-out infinite;
-        }
-        @media (max-width: 768px) {
-            .float-element {
-                animation: float 8s ease-in-out infinite;
-            }
         }
         @keyframes float {
             0%, 100% { transform: translateY(0px) rotate(0deg); }
@@ -259,9 +390,7 @@
             background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
             transition: left 0.6s;
         }
-        .image-reveal:active::before {
-            left: 100%;
-        }
+        .image-reveal:active::before { left: 100%; }
 
         /* Grain Effect */
         .grain {
@@ -271,13 +400,13 @@
             content: '';
             position: absolute;
             inset: 0;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.5'/%3E%3C/svg%3E");
+            background-image: url("image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.5'/%3E%3C/svg%3E");
             opacity: 0.05;
             pointer-events: none;
             z-index: 1;
         }
 
-        /* Loading Screen - Mobile optimized */
+        /* Loading Screen */
         .loader {
             position: fixed;
             inset: 0;
@@ -302,10 +431,7 @@
             opacity: 0;
         }
         @keyframes letterPop {
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            to { opacity: 1; transform: translateY(0); }
         }
         .loader-bar {
             width: 200px;
@@ -336,25 +462,6 @@
             pointer-events: none;
         }
 
-        /* Advanced Hover Card - Touch friendly */
-        .hover-card {
-            position: relative;
-            overflow: hidden;
-        }
-        @media (min-width: 769px) {
-            .hover-card::before {
-                content: '';
-                position: absolute;
-                inset: 0;
-                background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255, 62, 0, 0.4) 0%, transparent 50%);
-                opacity: 0;
-                transition: opacity 0.3s;
-            }
-            .hover-card:hover::before {
-                opacity: 1;
-            }
-        }
-
         /* Counter Animation Box */
         .counter-box {
             background: linear-gradient(135deg, rgba(255, 62, 0, 0.1), rgba(212, 175, 55, 0.1));
@@ -362,7 +469,7 @@
             backdrop-filter: blur(10px);
         }
 
-        /* Navigation - Mobile optimized */
+        /* Navigation */
         .nav-link {
             position: relative;
             overflow: hidden;
@@ -379,9 +486,7 @@
             transition: transform 0.3s cubic-bezier(0.23, 1, 0.32, 1);
         }
         @media (min-width: 769px) {
-            .nav-link:hover::after {
-                transform: translateX(0);
-            }
+            .nav-link:hover::after { transform: translateX(0); }
         }
 
         /* Mobile Menu */
@@ -399,9 +504,7 @@
             transition: right 0.4s cubic-bezier(0.23, 1, 0.32, 1);
             overflow-y: auto;
         }
-        .mobile-menu.active {
-            right: 0;
-        }
+        .mobile-menu.active { right: 0; }
         .mobile-menu-overlay {
             position: fixed;
             inset: 0;
@@ -411,10 +514,7 @@
             visibility: hidden;
             transition: all 0.3s;
         }
-        .mobile-menu-overlay.active {
-            opacity: 1;
-            visibility: visible;
-        }
+        .mobile-menu-overlay.active { opacity: 1; visibility: visible; }
         .mobile-menu-link {
             display: block;
             padding: 1.25rem 0;
@@ -423,12 +523,9 @@
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             transition: color 0.3s, padding-left 0.3s;
         }
-        .mobile-menu-link:active {
-            color: #ff3e00;
-            padding-left: 1rem;
-        }
+        .mobile-menu-link:active { color: #ff3e00; padding-left: 1rem; }
 
-        /* Gallery Item - Mobile optimized */
+        /* Gallery Item */
         .gallery-item {
             break-inside: avoid;
             margin-bottom: 1rem;
@@ -437,11 +534,7 @@
             border-radius: 1rem;
             aspect-ratio: 4/3;
         }
-        @media (min-width: 640px) {
-            .gallery-item {
-                aspect-ratio: auto;
-            }
-        }
+        @media (min-width: 640px) { .gallery-item { aspect-ratio: auto; } }
         .gallery-item::after {
             content: '';
             position: absolute;
@@ -451,9 +544,7 @@
             transition: opacity 0.3s;
         }
         @media (min-width: 769px) {
-            .gallery-item:hover::after {
-                opacity: 1;
-            }
+            .gallery-item:hover::after { opacity: 1; }
         }
         .gallery-item img {
             width: 100%;
@@ -462,9 +553,7 @@
             transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
         }
         @media (min-width: 769px) {
-            .gallery-item:active img {
-                transform: scale(1.1);
-            }
+            .gallery-item:active img { transform: scale(1.1); }
         }
         .gallery-item-content {
             position: absolute;
@@ -477,9 +566,7 @@
             z-index: 1;
         }
         @media (min-width: 769px) {
-            .gallery-item:hover .gallery-item-content {
-                transform: translateY(0);
-            }
+            .gallery-item:hover .gallery-item-content { transform: translateY(0); }
         }
         @media (max-width: 768px) {
             .gallery-item-content {
@@ -488,119 +575,43 @@
             }
         }
 
-        /* Video Card Flip - Simplified for mobile */
-        .video-flip {
-            transform-style: preserve-3d;
-            transform: perspective(1000px);
-        }
-        @media (max-width: 768px) {
-            .video-flip {
-                transform: none;
-            }
-            .video-flip-inner {
-                transform: none !important;
-            }
-            .video-back {
-                transform: none !important;
-                position: relative;
-                opacity: 0;
-                height: 0;
-                overflow: hidden;
-            }
-            .video-flip:active .video-back,
-            .video-flip.active .video-back {
-                opacity: 1;
-                height: auto;
-                padding: 2rem;
-            }
-        }
-        .video-flip-inner {
-            transition: transform 0.8s cubic-bezier(0.23, 1, 0.32, 1);
-            transform-style: preserve-3d;
-            position: relative;
-        }
-        @media (min-width: 769px) {
-            .video-flip:active .video-flip-inner,
-            .video-flip:hover .video-flip-inner {
-                transform: rotateY(180deg);
-            }
-        }
-        .video-front, .video-back {
-            backface-visibility: hidden;
-            position: absolute;
-            inset: 0;
-            border-radius: 1.5rem;
-            overflow: hidden;
-        }
-        .video-back {
-            transform: rotateY(180deg);
-            background: linear-gradient(135deg, #ff3e00, #d4af37);
-        }
-
-        /* Modal - Mobile optimized */
+        /* Modal */
         .modal {
             opacity: 0;
             visibility: hidden;
             transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
             padding: 1rem;
         }
-        @media (min-width: 768px) {
-            .modal {
-                padding: 4rem;
-            }
-        }
-        .modal.active {
-            opacity: 1;
-            visibility: visible;
-        }
+        @media (min-width: 768px) { .modal { padding: 4rem; } }
+        .modal.active { opacity: 1; visibility: visible; }
         .modal-content {
             transform: scale(0.9) rotateX(15deg);
             transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1);
             max-height: 90vh;
             overflow: auto;
         }
-        .modal.active .modal-content {
-            transform: scale(1) rotateX(0);
-        }
+        .modal.active .modal-content { transform: scale(1) rotateX(0); }
 
-        /* Masonry Grid - Mobile optimized */
+        /* Masonry Grid */
         .masonry-grid {
             column-count: 1;
             column-gap: 1rem;
         }
         @media (min-width: 640px) {
-            .masonry-grid {
-                column-count: 2;
-                column-gap: 1.5rem;
-            }
+            .masonry-grid { column-count: 2; column-gap: 1.5rem; }
         }
-        @media (min-width: 1024px) {
-            .masonry-grid {
-                column-count: 3;
-            }
-        }
+        @media (min-width: 1024px) { .masonry-grid { column-count: 3; } }
 
-        /* Typography - Responsive with better word breaking */
+        /* Typography - Fixed for mobile */
         .hero-title {
-            font-size: clamp(2.5rem, 8vw, 6rem);
+            font-size: clamp(2.5rem, 9vw, 5rem);
             line-height: 1;
             word-wrap: break-word;
             overflow-wrap: break-word;
             hyphens: auto;
             max-width: 100%;
+            letter-spacing: -0.02em;
         }
-        @media (min-width: 768px) {
-            .hero-title {
-                font-size: clamp(3.5rem, 10vw, 7rem);
-                line-height: 0.95;
-            }
-        }
-        @media (min-width: 1024px) {
-            .hero-title {
-                font-size: clamp(4rem, 12vw, 9rem);
-            }
-        }
-        
         .section-title {
             font-size: clamp(2rem, 7vw, 4rem);
             line-height: 1.1;
@@ -608,78 +619,220 @@
             overflow-wrap: break-word;
             hyphens: auto;
         }
-        @media (min-width: 768px) {
-            .section-title {
-                font-size: clamp(3rem, 8vw, 5rem);
-            }
-        }
-
-        /* Text wrapper to prevent awkward breaks */
-        .text-nowrap-mobile {
-            display: inline;
-        }
-        @media (max-width: 768px) {
-            .text-nowrap-mobile br {
-                display: none;
-            }
-        }
-
-        /* Form Inputs - Touch optimized */
-        input, textarea, select {
-            font-size: 16px; /* Prevents zoom on iOS */
-            min-height: 56px; /* Touch-friendly height */
-        }
-
-        /* Touch-friendly buttons */
-        button, a {
-            min-height: 44px;
-            min-width: 44px;
-        }
-
-        /* Prevent horizontal scroll */
-        body, html {
-            max-width: 100%;
-            overflow-x: hidden;
-        }
-
-        /* Smooth scroll behavior */
-        @media (prefers-reduced-motion: no-preference) {
-            html {
-                scroll-behavior: smooth;
-            }
-        }
-
-        /* Improve readability on mobile */
-        @media (max-width: 768px) {
-            p, li {
-                line-height: 1.7;
-            }
-            h1, h2, h3, h4 {
-                line-height: 1.2;
-            }
-        }
-
-        /* Counter box mobile */
-        @media (max-width: 640px) {
-            .counter-box {
-                padding: 1.5rem 1rem;
-            }
-            .counter-box .text-4xl {
-                font-size: 2rem;
-            }
-        }
-
-        /* Fix text wrapping in headings */
         h1, h2, h3 {
             word-break: normal;
             overflow-wrap: break-word;
             text-wrap: balance;
         }
-        
-        /* Ensure container doesn't force bad breaks */
         .text-container {
             max-width: 100%;
             width: 100%;
+        }
+
+        /* Flipbook Video Gallery */
+        .flipbook-container {
+            perspective: 2000px;
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto;
+            position: relative;
+        }
+        .flipbook {
+            position: relative;
+            width: 100%;
+            height: 500px;
+            transform-style: preserve-3d;
+        }
+        .flipbook-page {
+            position: absolute;
+            width: 50%;
+            height: 100%;
+            left: 50%;
+            transform-origin: left center;
+            transform-style: preserve-3d;
+            transition: transform 1s cubic-bezier(0.645, 0.045, 0.355, 1);
+            cursor: pointer;
+        }
+        .flipbook-page.flipped {
+            transform: rotateY(-180deg);
+        }
+        .flipbook-page-front, .flipbook-page-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 0 1rem 1rem 0;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        .flipbook-page-back {
+            transform: rotateY(180deg);
+            background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .flipbook-page-front {
+            background: #0a0a0a;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .video-thumbnail {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+        .video-thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .play-button {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 70px;
+            height: 70px;
+            background: rgba(255, 62, 0, 0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s;
+        }
+        .video-thumbnail:hover .play-button { transform: translate(-50%, -50%) scale(1.1); }
+        .play-button i {
+            color: white;
+            font-size: 28px;
+            margin-left: 5px;
+        }
+        .page-number {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            font-size: 12px;
+            color: rgba(255,255,255,0.5);
+        }
+        .flipbook-nav {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        .flipbook-nav button {
+            padding: 0.75rem 1.5rem;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .flipbook-nav button:hover {
+            background: #ff3e00;
+            border-color: #ff3e00;
+        }
+        .flipbook-nav button:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        /* Form Inputs */
+        input, textarea, select {
+            font-size: 16px;
+            min-height: 56px;
+        }
+        button, a { min-height: 44px; min-width: 44px; }
+        body, html { max-width: 100%; overflow-x: hidden; }
+        
+        @media (prefers-reduced-motion: no-preference) {
+            html { scroll-behavior: smooth; }
+        }
+        @media (max-width: 768px) {
+            p, li { line-height: 1.7; }
+            h1, h2, h3, h4 { line-height: 1.2; }
+            .counter-box { padding: 1.5rem 1rem; }
+            .counter-box .text-4xl { font-size: 2rem; }
+        }
+
+        /* Parallax Elements */
+        .parallax-element {
+            will-change: transform;
+        }
+
+        /* Shimmer Effect */
+        .shimmer {
+            position: relative;
+            overflow: hidden;
+        }
+        .shimmer::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            animation: shimmer 3s infinite;
+        }
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        /* Glow Effect */
+        .glow {
+            position: relative;
+        }
+        .glow::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            background: linear-gradient(135deg, #ff3e00, #d4af37);
+            border-radius: inherit;
+            z-index: -1;
+            opacity: 0;
+            filter: blur(20px);
+            transition: opacity 0.3s;
+        }
+        .glow:hover::before { opacity: 0.5; }
+
+        /* Text Scramble Effect */
+        .scramble-text {
+            display: inline-block;
+        }
+
+        /* Light Rays Effect */
+        .light-rays {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            background: repeating-conic-gradient(
+                from 0deg at 50% 50%,
+                transparent 0deg,
+                rgba(255, 62, 0, 0.02) 10deg,
+                transparent 20deg
+            );
+            animation: raysRotate 60s linear infinite;
+            opacity: 0.5;
+        }
+        @media (max-width: 768px) {
+            .light-rays { display: none; }
+        }
+        @keyframes raysRotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Particle Canvas */
+        #particleCanvas {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            opacity: 0.4;
+            pointer-events: none;
+        }
+        @media (max-width: 768px) {
+            #particleCanvas { display: none; }
         }
     </style>
 </head>
@@ -687,9 +840,7 @@
 
     <!-- Loading Screen -->
     <div class="loader" id="loader">
-        <div class="loader-text font-display" id="loaderText">
-            <!-- Letters injected by JS -->
-        </div>
+        <div class="loader-text font-display" id="loaderText"></div>
         <div class="loader-bar">
             <div class="loader-progress" id="loaderProgress"></div>
         </div>
@@ -702,8 +853,26 @@
     <!-- Noise Overlay -->
     <div class="noise"></div>
 
-    <!-- Gradient Mesh -->
+    <!-- Enhanced Background Layers -->
     <div class="gradient-mesh"></div>
+    <div class="grid-pattern"></div>
+    <div class="aurora"></div>
+    <div class="dots-pattern"></div>
+    <div class="light-rays"></div>
+    
+    <!-- Floating Orbs -->
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+    <div class="orb orb-4"></div>
+
+    <!-- Geometric Shapes -->
+    <div class="geo-shape geo-1"></div>
+    <div class="geo-shape geo-2"></div>
+    <div class="geo-shape geo-3"></div>
+
+    <!-- Particle Canvas -->
+    <canvas id="particleCanvas"></canvas>
 
     <!-- Scroll Progress -->
     <div class="scroll-progress" id="scrollProgress"></div>
@@ -723,8 +892,8 @@
             <button onclick="scrollToSection('home'); closeMobileMenu();" class="mobile-menu-link w-full text-left">Home</button>
             <button onclick="scrollToSection('about'); closeMobileMenu();" class="mobile-menu-link w-full text-left">About</button>
             <button onclick="scrollToSection('programs'); closeMobileMenu();" class="mobile-menu-link w-full text-left">Programs</button>
-            <button onclick="scrollToSection('gallery'); closeMobileMenu();" class="mobile-menu-link w-full text-left">Gallery</button>
-            <button onclick="scrollToSection('videos'); closeMobileMenu();" class="mobile-menu-link w-full text-left">Videos</button>
+            <button onclick="scrollToSection('videos'); closeMobileMenu();" class="mobile-menu-link w-full text-left">Video Gallery</button>
+            <button onclick="scrollToSection('gallery'); closeMobileMenu();" class="mobile-menu-link w-full text-left">Photo Gallery</button>
             <button onclick="scrollToSection('contact'); closeMobileMenu();" class="mobile-menu-link w-full text-left text-[#ff3e00]">Contact Us</button>
         </nav>
     </div>
@@ -737,18 +906,16 @@
                 <span class="hidden sm:block font-display font-bold text-lg">Abhyudaya</span>
             </button>
             
-            <!-- Desktop Menu -->
             <div class="hidden lg:flex items-center gap-6">
                 <button onclick="scrollToSection('home')" class="nav-link text-sm font-medium tracking-wider uppercase hover:text-[#ff3e00] transition-colors">Home</button>
                 <button onclick="scrollToSection('about')" class="nav-link text-sm font-medium tracking-wider uppercase hover:text-[#ff3e00] transition-colors">About</button>
                 <button onclick="scrollToSection('programs')" class="nav-link text-sm font-medium tracking-wider uppercase hover:text-[#ff3e00] transition-colors">Programs</button>
-                <button onclick="scrollToSection('gallery')" class="nav-link text-sm font-medium tracking-wider uppercase hover:text-[#ff3e00] transition-colors">Gallery</button>
+                <button onclick="scrollToSection('videos')" class="nav-link text-sm font-medium tracking-wider uppercase hover:text-[#ff3e00] transition-colors">Videos</button>
                 <button onclick="scrollToSection('contact')" class="magnetic-btn">
                     <span>Contact</span>
                 </button>
             </div>
 
-            <!-- Mobile Menu Button -->
             <button onclick="openMobileMenu()" class="lg:hidden text-white text-2xl p-2 magnetic-btn" style="background: rgba(255,255,255,0.1);">
                 <i class="ri-menu-line"></i>
             </button>
@@ -757,8 +924,7 @@
 
     <!-- Hero Section -->
     <section id="home" class="relative min-h-screen flex items-center justify-center overflow-hidden px-4 md:px-6 py-20">
-        <!-- Parallax Background Elements - Simplified for mobile -->
-        <div class="parallax-layer absolute inset-0 hidden md:block" data-speed="0.5">
+        <div class="parallax-element absolute inset-0 hidden md:block" data-speed="0.5">
             <div class="absolute top-20 left-10 w-96 h-96 bg-[#ff3e00] rounded-full blur-[120px] opacity-20 float-element"></div>
             <div class="absolute bottom-20 right-10 w-96 h-96 bg-[#d4af37] rounded-full blur-[120px] opacity-20 float-element" style="animation-delay: 3s;"></div>
         </div>
@@ -797,7 +963,6 @@
                         </button>
                     </div>
 
-                    <!-- Stats - Mobile optimized -->
                     <div class="grid grid-cols-3 gap-3 md:gap-6 pt-8 md:pt-12 border-t border-white/10 opacity-0" id="heroStats">
                         <div class="counter-box rounded-xl md:rounded-2xl p-3 md:p-6 text-center">
                             <p class="font-display font-bold text-3xl md:text-4xl lg:text-5xl text-[#ff3e00] counter" data-target="1500">0</p>
@@ -822,13 +987,11 @@
                                  class="w-full h-auto object-cover transform hover:scale-110 transition-transform duration-700">
                         </div>
                         
-                        <!-- Floating Badge -->
-                        <div class="absolute -top-6 -right-6 bg-[#ff3e00] text-white p-4 md:p-6 rounded-2xl shadow-2xl float-element morph-shape hidden md:block">
+                        <div class="absolute -top-6 -right-6 bg-[#ff3e00] text-white p-4 md:p-6 rounded-2xl shadow-2xl float-element hidden md:block">
                             <i class="ri-trophy-line text-3xl md:text-4xl mb-2 block"></i>
                             <p class="font-bold text-sm">Best School 2024</p>
                         </div>
 
-                        <!-- Floating Stats -->
                         <div class="absolute -bottom-6 -left-6 bg-white/10 backdrop-blur-xl border border-white/20 p-4 md:p-6 rounded-2xl float-element hidden md:block" style="animation-delay: 1.5s;">
                             <p class="font-display font-bold text-2xl md:text-3xl text-[#d4af37]">A+</p>
                             <p class="text-xs text-gray-300">Rating</p>
@@ -838,7 +1001,6 @@
             </div>
         </div>
 
-        <!-- Scroll Indicator - Desktop only -->
         <div class="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-50 hidden md:flex">
             <span class="text-xs uppercase tracking-widest">Scroll</span>
             <div class="w-px h-12 bg-gradient-to-b from-[#ff3e00] to-transparent"></div>
@@ -888,9 +1050,7 @@
                     <div class="grid grid-cols-2 gap-4 md:gap-6">
                         <div class="space-y-4 md:space-y-6 mt-8 md:mt-12">
                             <div class="image-reveal rounded-xl md:rounded-2xl overflow-hidden">
-                                <img src="https://image.qwenlm.ai/public_source/cd6f2f41-0691-47bb-9faa-39cc3929d65f/1a750243d-4828-4377-992f-a2e8d4426d8b.png" 
-                                     alt="Students" 
-                                     class="w-full h-48 md:h-64 object-cover">
+                                <img src="https://image.qwenlm.ai/public_source/cd6f2f41-0691-47bb-9faa-39cc3929d65f/1a750243d-4828-4377-992f-a2e8d4426d8b.png" alt="Students" class="w-full h-48 md:h-64 object-cover">
                             </div>
                             <div class="counter-box rounded-xl md:rounded-2xl p-4 md:p-6 text-center">
                                 <p class="font-display font-bold text-3xl md:text-4xl text-[#ff3e00] counter" data-target="150">0</p>
@@ -903,9 +1063,7 @@
                                 <p class="text-xs text-gray-400 uppercase mt-2">% Success Rate</p>
                             </div>
                             <div class="image-reveal rounded-xl md:rounded-2xl overflow-hidden">
-                                <img src="https://image.qwenlm.ai/public_source/cd6f2f41-0691-47bb-9faa-39cc3929d65f/16fa9aeb7-2f58-4fae-84b9-14cb9c1e7371.png" 
-                                     alt="Campus" 
-                                     class="w-full h-48 md:h-64 object-cover">
+                                <img src="https://image.qwenlm.ai/public_source/cd6f2f41-0691-47bb-9faa-39cc3929d65f/16fa9aeb7-2f58-4fae-84b9-14cb9c1e7371.png" alt="Campus" class="w-full h-48 md:h-64 object-cover">
                             </div>
                         </div>
                     </div>
@@ -926,7 +1084,6 @@
             </div>
 
             <div class="grid md:grid-cols-3 gap-6 md:gap-8">
-                <!-- Program 1 -->
                 <div class="card-3d group relative bg-secondary/50 rounded-2xl md:rounded-3xl p-6 md:p-8 border border-white/10 active:border-[#ff3e00]/50 transition-all duration-500">
                     <div class="card-3d-content">
                         <div class="w-14 h-14 md:w-16 md:h-16 bg-gradient-to-br from-[#ff3e00] to-[#ff6b35] rounded-xl md:rounded-2xl flex items-center justify-center text-white text-2xl md:text-3xl mb-4 md:mb-6 group-active:scale-110 transition-transform">
@@ -936,16 +1093,13 @@
                         <p class="text-gray-400 text-sm md:text-base mb-4 md:mb-6">Comprehensive coaching for Sainik School entrance with physical training.</p>
                         <ul class="space-y-2 md:space-y-3 mb-6 md:mb-8 text-sm">
                             <li class="flex items-center gap-2 md:gap-3 text-gray-300">
-                                <i class="ri-check-line text-[#ff3e00]"></i>
-                                Classes 5th, 6th & 8th
+                                <i class="ri-check-line text-[#ff3e00]"></i> Classes 5th, 6th & 8th
                             </li>
                             <li class="flex items-center gap-2 md:gap-3 text-gray-300">
-                                <i class="ri-check-line text-[#ff3e00]"></i>
-                                Physical Training
+                                <i class="ri-check-line text-[#ff3e00]"></i> Physical Training
                             </li>
                             <li class="flex items-center gap-2 md:gap-3 text-gray-300">
-                                <i class="ri-check-line text-[#ff3e00]"></i>
-                                Interview Prep
+                                <i class="ri-check-line text-[#ff3e00]"></i> Interview Prep
                             </li>
                         </ul>
                         <button class="w-full py-3 md:py-4 bg-white/5 border border-white/10 rounded-xl active:bg-[#ff3e00] active:border-[#ff3e00] transition-all magnetic-btn text-sm md:text-base" style="background: transparent;">
@@ -954,7 +1108,6 @@
                     </div>
                 </div>
 
-                <!-- Program 2 -->
                 <div class="card-3d group relative bg-secondary/50 rounded-2xl md:rounded-3xl p-6 md:p-8 border border-white/10 active:border-[#d4af37]/50 transition-all duration-500">
                     <div class="card-3d-content">
                         <div class="w-14 h-14 md:w-16 md:h-16 bg-gradient-to-br from-[#d4af37] to-[#f59e0b] rounded-xl md:rounded-2xl flex items-center justify-center text-black text-2xl md:text-3xl mb-4 md:mb-6 group-active:scale-110 transition-transform">
@@ -964,16 +1117,13 @@
                         <p class="text-gray-400 text-sm md:text-base mb-4 md:mb-6">Specialized coaching for RMS and Jawahar Navodaya Vidyalaya.</p>
                         <ul class="space-y-2 md:space-y-3 mb-6 md:mb-8 text-sm">
                             <li class="flex items-center gap-2 md:gap-3 text-gray-300">
-                                <i class="ri-check-line text-[#d4af37]"></i>
-                                Expert Faculty
+                                <i class="ri-check-line text-[#d4af37]"></i> Expert Faculty
                             </li>
                             <li class="flex items-center gap-2 md:gap-3 text-gray-300">
-                                <i class="ri-check-line text-[#d4af37]"></i>
-                                Mock Tests
+                                <i class="ri-check-line text-[#d4af37]"></i> Mock Tests
                             </li>
                             <li class="flex items-center gap-2 md:gap-3 text-gray-300">
-                                <i class="ri-check-line text-[#d4af37]"></i>
-                                Study Material
+                                <i class="ri-check-line text-[#d4af37]"></i> Study Material
                             </li>
                         </ul>
                         <button class="w-full py-3 md:py-4 bg-white/5 border border-white/10 rounded-xl active:bg-[#d4af37] active:border-[#d4af37] active:text-black transition-all magnetic-btn text-sm md:text-base" style="background: transparent;">
@@ -982,7 +1132,6 @@
                     </div>
                 </div>
 
-                <!-- Program 3 -->
                 <div class="card-3d group relative bg-secondary/50 rounded-2xl md:rounded-3xl p-6 md:p-8 border border-white/10 active:border-white/50 transition-all duration-500">
                     <div class="card-3d-content">
                         <div class="w-14 h-14 md:w-16 md:h-16 bg-gradient-to-br from-white to-gray-300 rounded-xl md:rounded-2xl flex items-center justify-center text-black text-2xl md:text-3xl mb-4 md:mb-6 group-active:scale-110 transition-transform">
@@ -992,16 +1141,13 @@
                         <p class="text-gray-400 text-sm md:text-base mb-4 md:mb-6">Complete K-12 education with CBSE/State board curriculum.</p>
                         <ul class="space-y-2 md:space-y-3 mb-6 md:mb-8 text-sm">
                             <li class="flex items-center gap-2 md:gap-3 text-gray-300">
-                                <i class="ri-check-line text-white"></i>
-                                Smart Classrooms
+                                <i class="ri-check-line text-white"></i> Smart Classrooms
                             </li>
                             <li class="flex items-center gap-2 md:gap-3 text-gray-300">
-                                <i class="ri-check-line text-white"></i>
-                                Extracurricular
+                                <i class="ri-check-line text-white"></i> Extracurricular
                             </li>
                             <li class="flex items-center gap-2 md:gap-3 text-gray-300">
-                                <i class="ri-check-line text-white"></i>
-                                Transport
+                                <i class="ri-check-line text-white"></i> Transport
                             </li>
                         </ul>
                         <button class="w-full py-3 md:py-4 bg-white/5 border border-white/10 rounded-xl active:bg-white active:text-black transition-all magnetic-btn text-sm md:text-base" style="background: transparent;">
@@ -1013,12 +1159,136 @@
         </div>
     </section>
 
-    <!-- Gallery Section -->
+    <!-- Flipbook Video Gallery Section -->
+    <section id="videos" class="relative py-20 md:py-32 px-4 md:px-6 bg-gradient-to-b from-secondary/30 to-primary">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-12 md:mb-16 text-container">
+                <p class="text-[#ff3e00] font-medium tracking-[0.2em] uppercase text-xs md:text-sm mb-4 reveal-text">Video Gallery</p>
+                <h2 class="font-display font-bold text-4xl md:text-5xl lg:text-7xl mb-6 split-text" data-split>Virtual Tour</h2>
+                <p class="text-gray-400 max-w-2xl mx-auto text-sm md:text-base">Flip through our digital book of campus highlights and events</p>
+            </div>
+
+            <div class="flipbook-container reveal">
+                <div class="flipbook" id="flipbook">
+                    <!-- Page 1 -->
+                    <div class="flipbook-page" data-page="0" onclick="flipPage(0)">
+                        <div class="flipbook-page-front">
+                            <div class="video-thumbnail">
+                                <img src="https://image.qwenlm.ai/public_source/cd6f2f41-0691-47bb-9faa-39cc3929d65f/133ab7ea8-32f7-4563-a44c-933470bc6fb8.png" alt="Campus Tour">
+                                <div class="play-button">
+                                    <i class="ri-play-fill"></i>
+                                </div>
+                            </div>
+                            <div class="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/90 to-transparent">
+                                <h3 class="font-bold text-lg mb-1">Campus Infrastructure</h3>
+                                <p class="text-sm text-gray-300">Explore our world-class facilities</p>
+                            </div>
+                            <span class="page-number">01</span>
+                        </div>
+                        <div class="flipbook-page-back flex items-center justify-center p-8">
+                            <div class="text-center">
+                                <i class="ri-building-4-line text-6xl text-[#ff3e00] mb-4"></i>
+                                <h3 class="font-bold text-2xl mb-4">Modern Campus</h3>
+                                <p class="text-gray-400 text-sm mb-6">State-of-the-art infrastructure with smart classrooms, modern laboratories, and extensive sports facilities.</p>
+                                <button class="px-6 py-3 bg-[#ff3e00] rounded-full text-sm font-bold hover:bg-[#ff6b35] transition-colors">Watch Video</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Page 2 -->
+                    <div class="flipbook-page" data-page="1" onclick="flipPage(1)">
+                        <div class="flipbook-page-front">
+                            <div class="video-thumbnail">
+                                <img src="https://image.qwenlm.ai/public_source/cd6f2f41-0691-47bb-9faa-39cc3929d65f/1a750243d-4828-4377-992f-a2e8d4426d8b.png" alt="Sports Day">
+                                <div class="play-button">
+                                    <i class="ri-play-fill"></i>
+                                </div>
+                            </div>
+                            <div class="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/90 to-transparent">
+                                <h3 class="font-bold text-lg mb-1">Annual Sports Day</h3>
+                                <p class="text-sm text-gray-300">Track & Field Events 2024</p>
+                            </div>
+                            <span class="page-number">02</span>
+                        </div>
+                        <div class="flipbook-page-back flex items-center justify-center p-8">
+                            <div class="text-center">
+                                <i class="ri-trophy-line text-6xl text-[#d4af37] mb-4"></i>
+                                <h3 class="font-bold text-2xl mb-4">Sports Excellence</h3>
+                                <p class="text-gray-400 text-sm mb-6">Annual sports day featuring athletics, football, cricket, and various indoor games with inter-house competitions.</p>
+                                <button class="px-6 py-3 bg-[#d4af37] text-black rounded-full text-sm font-bold hover:bg-[#f59e0b] transition-colors">Watch Video</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Page 3 -->
+                    <div class="flipbook-page" data-page="2" onclick="flipPage(2)">
+                        <div class="flipbook-page-front">
+                            <div class="video-thumbnail">
+                                <img src="https://image.qwenlm.ai/public_source/cd6f2f41-0691-47bb-9faa-39cc3929d65f/16fa9aeb7-2f58-4fae-84b9-14cb9c1e7371.png" alt="Science Fair">
+                                <div class="play-button">
+                                    <i class="ri-play-fill"></i>
+                                </div>
+                            </div>
+                            <div class="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/90 to-transparent">
+                                <h3 class="font-bold text-lg mb-1">Science Exhibition</h3>
+                                <p class="text-sm text-gray-300">Innovation & Creativity</p>
+                            </div>
+                            <span class="page-number">03</span>
+                        </div>
+                        <div class="flipbook-page-back flex items-center justify-center p-8">
+                            <div class="text-center">
+                                <i class="ri-flask-line text-6xl text-[#3b82f6] mb-4"></i>
+                                <h3 class="font-bold text-2xl mb-4">Science & Innovation</h3>
+                                <p class="text-gray-400 text-sm mb-6">Annual science exhibition showcasing student projects, experiments, and innovative ideas in various fields.</p>
+                                <button class="px-6 py-3 bg-[#3b82f6] rounded-full text-sm font-bold hover:bg-[#60a5fa] transition-colors">Watch Video</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Page 4 -->
+                    <div class="flipbook-page" data-page="3" onclick="flipPage(3)">
+                        <div class="flipbook-page-front">
+                            <div class="video-thumbnail">
+                                <img src="https://image.qwenlm.ai/public_source/cd6f2f41-0691-47bb-9faa-39cc3929d65f/146c34062-3251-4da6-a3c7-6bbc5f1cdbbf.png" alt="Cultural Event">
+                                <div class="play-button">
+                                    <i class="ri-play-fill"></i>
+                                </div>
+                            </div>
+                            <div class="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/90 to-transparent">
+                                <h3 class="font-bold text-lg mb-1">Annual Day</h3>
+                                <p class="text-sm text-gray-300">Cultural Celebration</p>
+                            </div>
+                            <span class="page-number">04</span>
+                        </div>
+                        <div class="flipbook-page-back flex items-center justify-center p-8">
+                            <div class="text-center">
+                                <i class="ri-music-2-line text-6xl text-[#ec4899] mb-4"></i>
+                                <h3 class="font-bold text-2xl mb-4">Cultural Fest</h3>
+                                <p class="text-gray-400 text-sm mb-6">Grand annual day celebration with dance, music, drama performances, and prize distribution ceremony.</p>
+                                <button class="px-6 py-3 bg-[#ec4899] rounded-full text-sm font-bold hover:bg-[#f472b6] transition-colors">Watch Video</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flipbook-nav">
+                    <button onclick="previousPage()" id="prevBtn">
+                        <i class="ri-arrow-left-s-line mr-2"></i> Previous
+                    </button>
+                    <button onclick="nextPage()" id="nextBtn">
+                        Next <i class="ri-arrow-right-s-line ml-2"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Photo Gallery Section -->
     <section id="gallery" class="relative py-20 md:py-32 px-4 md:px-6">
         <div class="max-w-7xl mx-auto">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-8 md:mb-16 gap-4 text-container">
                 <div class="text-center sm:text-left">
-                    <p class="text-[#ff3e00] font-medium tracking-[0.2em] uppercase text-xs md:text-sm mb-4 reveal-text">Gallery</p>
+                    <p class="text-[#ff3e00] font-medium tracking-[0.2em] uppercase text-xs md:text-sm mb-4 reveal-text">Photo Gallery</p>
                     <h2 class="font-display font-bold text-4xl md:text-5xl lg:text-7xl split-text" data-split>Campus Life</h2>
                 </div>
                 <button class="magnetic-btn hidden sm:block">
@@ -1026,7 +1296,7 @@
                 </button>
             </div>
 
-            <div class="masonry-grid">
+            <div class="masonry-grid reveal">
                 <div class="gallery-item active" onclick="openModal('https://image.qwenlm.ai/public_source/cd6f2f41-0691-47bb-9faa-39cc3929d65f/1a750243d-4828-4377-992f-a2e8d4426d8b.png')">
                     <img src="https://image.qwenlm.ai/public_source/cd6f2f41-0691-47bb-9faa-39cc3929d65f/1a750243d-4828-4377-992f-a2e8d4426d8b.png" alt="Sports" loading="lazy">
                     <div class="gallery-item-content">
@@ -1053,62 +1323,6 @@
             <button class="magnetic-btn w-full mt-6 sm:hidden" onclick="alert('More photos coming soon!')">
                 <span>View All Photos</span>
             </button>
-        </div>
-    </section>
-
-    <!-- Video Section -->
-    <section id="videos" class="relative py-20 md:py-32 px-4 md:px-6 bg-secondary/30">
-        <div class="max-w-7xl mx-auto">
-            <div class="text-center mb-12 md:mb-16 text-container">
-                <p class="text-[#ff3e00] font-medium tracking-[0.2em] uppercase text-xs md:text-sm mb-4 reveal-text">Videos</p>
-                <h2 class="font-display font-bold text-4xl md:text-5xl lg:text-7xl split-text" data-split>Virtual Tour</h2>
-            </div>
-
-            <div class="grid md:grid-cols-2 gap-6 md:gap-8 max-w-5xl mx-auto">
-                <div class="video-flip h-64 md:h-80 cursor-pointer group" onclick="toggleVideoFlip(this)">
-                    <div class="video-flip-inner relative w-full h-full rounded-2xl md:rounded-3xl overflow-hidden">
-                        <div class="video-front relative">
-                            <img src="https://image.qwenlm.ai/public_source/cd6f2f41-0691-47bb-9faa-39cc3929d65f/133ab7ea8-32f7-4563-a44c-933470bc6fb8.png" 
-                                 alt="Campus Tour" 
-                                 class="w-full h-full object-cover">
-                            <div class="absolute inset-0 bg-black/40 flex items-center justify-center group-active:bg-black/30 transition-all">
-                                <div class="w-16 h-16 md:w-20 md:h-20 bg-[#ff3e00] rounded-full flex items-center justify-center group-active:scale-110 transition-transform">
-                                    <i class="ri-play-fill text-3xl md:text-4xl text-white ml-1"></i>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="video-back rounded-2xl md:rounded-3xl p-6 md:p-8 flex flex-col justify-center items-center text-center">
-                            <h3 class="font-display font-bold text-xl md:text-2xl mb-3 md:mb-4">Campus Tour</h3>
-                            <p class="text-white/80 text-sm md:text-base mb-4 md:mb-6">Explore our world-class facilities.</p>
-                            <button class="px-5 py-2.5 md:px-6 md:py-3 bg-white text-black rounded-full font-bold text-sm md:text-base active:scale-105 transition-transform">
-                                Watch Now
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="video-flip h-64 md:h-80 cursor-pointer group" onclick="toggleVideoFlip(this)">
-                    <div class="video-flip-inner relative w-full h-full rounded-2xl md:rounded-3xl overflow-hidden">
-                        <div class="video-front relative bg-gradient-to-br from-[#d4af37] to-[#f59e0b]">
-                            <div class="absolute inset-0 flex items-center justify-center">
-                                <i class="ri-music-2-line text-6xl md:text-8xl text-black/20"></i>
-                            </div>
-                            <div class="absolute inset-0 bg-black/40 flex items-center justify-center group-active:bg-black/30 transition-all">
-                                <div class="w-16 h-16 md:w-20 md:h-20 bg-[#d4af37] rounded-full flex items-center justify-center group-active:scale-110 transition-transform">
-                                    <i class="ri-play-fill text-3xl md:text-4xl text-black ml-1"></i>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="video-back rounded-2xl md:rounded-3xl p-6 md:p-8 flex flex-col justify-center items-center text-center">
-                            <h3 class="font-display font-bold text-xl md:text-2xl mb-3 md:mb-4">Annual Day 2024</h3>
-                            <p class="text-white/80 text-sm md:text-base mb-4 md:mb-6">Highlights from our celebration.</p>
-                            <button class="px-5 py-2.5 md:px-6 md:py-3 bg-white text-black rounded-full font-bold text-sm md:text-base active:scale-105 transition-transform">
-                                Watch Now
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
     </section>
 
@@ -1223,11 +1437,81 @@
     </div>
 
     <script>
-        // Register GSAP Plugins
         gsap.registerPlugin(ScrollTrigger);
-
-        // Check if touch device
         const isTouchDevice = window.matchMedia('(pointer: coarse)').matches;
+
+        // Particle System
+        function initParticles() {
+            const canvas = document.getElementById('particleCanvas');
+            if (!canvas) return;
+            
+            const ctx = canvas.getContext('2d');
+            let particles = [];
+            let animationId;
+            
+            function resize() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+            resize();
+            window.addEventListener('resize', resize);
+            
+            class Particle {
+                constructor() {
+                    this.x = Math.random() * canvas.width;
+                    this.y = Math.random() * canvas.height;
+                    this.size = Math.random() * 2 + 0.5;
+                    this.speedX = Math.random() * 1 - 0.5;
+                    this.speedY = Math.random() * 1 - 0.5;
+                    this.opacity = Math.random() * 0.5 + 0.2;
+                }
+                
+                update() {
+                    this.x += this.speedX;
+                    this.y += this.speedY;
+                    
+                    if (this.x > canvas.width) this.x = 0;
+                    if (this.x < 0) this.x = canvas.width;
+                    if (this.y > canvas.height) this.y = 0;
+                    if (this.y < 0) this.y = canvas.height;
+                }
+                
+                draw() {
+                    ctx.fillStyle = `rgba(255, 62, 0, ${this.opacity})`;
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+            
+            function init() {
+                particles = [];
+                const particleCount = Math.min(50, Math.floor(window.innerWidth / 20));
+                for (let i = 0; i < particleCount; i++) {
+                    particles.push(new Particle());
+                }
+            }
+            init();
+            
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                particles.forEach(particle => {
+                    particle.update();
+                    particle.draw();
+                });
+                animationId = requestAnimationFrame(animate);
+            }
+            animate();
+            
+            return () => cancelAnimationFrame(animationId);
+        }
+        
+        // Initialize particles on load
+        window.addEventListener('load', () => {
+            if (!isTouchDevice) {
+                initParticles();
+            }
+        });
 
         // Loading Animation
         window.addEventListener('load', () => {
@@ -1235,7 +1519,6 @@
             const progress = document.getElementById('loaderProgress');
             const loaderText = document.getElementById('loaderText');
             
-            // Create letters
             const text = 'ABHYUDAYA';
             text.split('').forEach((char, i) => {
                 const span = document.createElement('span');
@@ -1244,14 +1527,12 @@
                 loaderText.appendChild(span);
             });
 
-            // Simulate loading progress
             let loadProgress = 0;
             const loadInterval = setInterval(() => {
                 loadProgress += Math.random() * 30;
                 if (loadProgress >= 100) {
                     loadProgress = 100;
                     clearInterval(loadInterval);
-                    
                     setTimeout(() => {
                         gsap.to(loader, {
                             yPercent: -100,
@@ -1265,13 +1546,11 @@
             }, 200);
         });
 
-        // Custom Cursor - Desktop only
+        // Custom Cursor
         if (!isTouchDevice) {
             const cursor = document.getElementById('cursor');
             const cursorFollower = document.getElementById('cursorFollower');
-            let mouseX = 0, mouseY = 0;
-            let cursorX = 0, cursorY = 0;
-            let followerX = 0, followerY = 0;
+            let mouseX = 0, mouseY = 0, cursorX = 0, cursorY = 0, followerX = 0, followerY = 0;
 
             document.addEventListener('mousemove', (e) => {
                 mouseX = e.clientX;
@@ -1283,19 +1562,15 @@
                 cursorY += (mouseY - cursorY) * 0.2;
                 followerX += (mouseX - followerX) * 0.1;
                 followerY += (mouseY - followerY) * 0.1;
-
                 cursor.style.left = cursorX - 10 + 'px';
                 cursor.style.top = cursorY - 10 + 'px';
                 cursorFollower.style.left = followerX - 20 + 'px';
                 cursorFollower.style.top = followerY - 20 + 'px';
-
                 requestAnimationFrame(animateCursor);
             }
             animateCursor();
 
-            // Cursor hover effect
-            const interactiveElements = document.querySelectorAll('a, button, .magnetic-btn, .gallery-item, .video-flip');
-            interactiveElements.forEach(el => {
+            document.querySelectorAll('a, button, .magnetic-btn, .gallery-item').forEach(el => {
                 el.addEventListener('mouseenter', () => {
                     cursor.classList.add('hover');
                     cursorFollower.classList.add('hover');
@@ -1313,7 +1588,6 @@
             document.getElementById('mobileMenuOverlay').classList.add('active');
             document.body.style.overflow = 'hidden';
         }
-
         function closeMobileMenu() {
             document.getElementById('mobileMenu').classList.remove('active');
             document.getElementById('mobileMenuOverlay').classList.remove('active');
@@ -1328,20 +1602,49 @@
             document.getElementById('scrollProgress').style.transform = `scaleX(${Math.max(0, Math.min(1, progress))})`;
         });
 
+        // Flipbook Functionality
+        let currentPage = 0;
+        const totalPages = 4;
+        const pages = document.querySelectorAll('.flipbook-page');
+
+        function flipPage(pageIndex) {
+            if (pageIndex === currentPage) {
+                pages[pageIndex].classList.toggle('flipped');
+            }
+        }
+
+        function nextPage() {
+            if (currentPage < totalPages - 1) {
+                pages[currentPage].classList.add('flipped');
+                currentPage++;
+                updateNavButtons();
+            }
+        }
+
+        function previousPage() {
+            if (currentPage > 0) {
+                currentPage--;
+                pages[currentPage].classList.remove('flipped');
+                updateNavButtons();
+            }
+        }
+
+        function updateNavButtons() {
+            document.getElementById('prevBtn').disabled = currentPage === 0;
+            document.getElementById('nextBtn').disabled = currentPage === totalPages - 1;
+        }
+
         // Initialize Animations
         function initAnimations() {
-            // Hero Animations
             gsap.to('#heroSubtitle', { opacity: 1, y: 0, duration: 0.8, delay: 0.2 });
             gsap.to('#heroDesc', { opacity: 1, y: 0, duration: 0.8, delay: 0.4 });
             gsap.to('#heroButtons', { opacity: 1, y: 0, duration: 0.8, delay: 0.6 });
             gsap.to('#heroStats', { opacity: 1, y: 0, duration: 0.8, delay: 0.8 });
 
-            // Reveal text animations
             document.querySelectorAll('.reveal-text').forEach(el => {
                 setTimeout(() => el.classList.add('active'), 100);
             });
 
-            // Split text animation
             document.querySelectorAll('[data-split]').forEach(el => {
                 const text = el.textContent;
                 el.innerHTML = '';
@@ -1354,7 +1657,6 @@
                     span.style.transition = `transform 0.6s cubic-bezier(0.23, 1, 0.32, 1) ${i * 0.03}s, opacity 0.6s ${i * 0.03}s`;
                     el.appendChild(span);
                 });
-                
                 setTimeout(() => {
                     el.querySelectorAll('span').forEach(span => {
                         span.style.transform = 'translateY(0)';
@@ -1363,7 +1665,6 @@
                 }, 100);
             });
 
-            // Counter animations
             ScrollTrigger.create({
                 trigger: '.counter',
                 start: 'top 80%',
@@ -1380,36 +1681,29 @@
                 }
             });
 
-            // Gallery items
             gsap.from('.gallery-item', {
                 y: 50,
                 opacity: 0,
                 duration: 0.6,
                 stagger: 0.15,
-                scrollTrigger: {
-                    trigger: '.masonry-grid',
-                    start: 'top 80%'
-                }
+                scrollTrigger: { trigger: '.masonry-grid', start: 'top 80%' }
+            });
+
+            // Parallax on scroll
+            gsap.utils.toArray('.parallax-element').forEach(layer => {
+                const speed = layer.getAttribute('data-speed') || 0.5;
+                gsap.to(layer, {
+                    y: () => window.innerHeight * speed,
+                    scrollTrigger: { trigger: layer, start: 'top top', end: 'bottom top', scrub: true }
+                });
             });
         }
 
-        // Smooth scroll to section
         function scrollToSection(sectionId) {
             const section = document.getElementById(sectionId);
             if (section) {
                 const offsetTop = section.offsetTop - 80;
-                gsap.to(window, {
-                    duration: 1,
-                    scrollTo: { y: offsetTop },
-                    ease: "power3.inOut"
-                });
-            }
-        }
-
-        // Toggle Video Flip (for mobile)
-        function toggleVideoFlip(element) {
-            if (isTouchDevice) {
-                element.classList.toggle('active');
+                gsap.to(window, { duration: 1, scrollTo: { y: offsetTop }, ease: "power3.inOut" });
             }
         }
 
@@ -1419,98 +1713,59 @@
             document.getElementById('modal').classList.add('active');
             document.body.style.overflow = 'hidden';
         }
-
         function closeModal() {
             document.getElementById('modal').classList.remove('active');
             document.body.style.overflow = '';
-            setTimeout(() => {
-                document.getElementById('modalImg').src = '';
-            }, 400);
+            setTimeout(() => { document.getElementById('modalImg').src = ''; }, 400);
         }
-
         function closeModalOnOverlay(event) {
-            if (event.target.id === 'modal') {
-                closeModal();
-            }
+            if (event.target.id === 'modal') closeModal();
         }
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
 
-        // Close modal on Escape
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') closeModal();
-        });
-
-        // Magnetic button effect - Desktop only
+        // Magnetic buttons - Desktop only
         if (!isTouchDevice) {
-            const magneticBtns = document.querySelectorAll('.magnetic-btn');
-            magneticBtns.forEach(btn => {
+            document.querySelectorAll('.magnetic-btn').forEach(btn => {
                 btn.addEventListener('mousemove', (e) => {
                     const rect = btn.getBoundingClientRect();
                     const x = e.clientX - rect.left - rect.width / 2;
                     const y = e.clientY - rect.top - rect.height / 2;
-                    
                     btn.style.transform = `translate(${x * 0.3}px, ${y * 0.3}px)`;
                 });
-                
-                btn.addEventListener('mouseleave', () => {
-                    btn.style.transform = 'translate(0, 0)';
-                });
+                btn.addEventListener('mouseleave', () => { btn.style.transform = 'translate(0, 0)'; });
             });
         }
 
-        // 3D Card tilt effect - Desktop only
+        // 3D Card tilt - Desktop only
         if (!isTouchDevice) {
             document.querySelectorAll('.card-3d').forEach(card => {
                 card.addEventListener('mousemove', (e) => {
                     const rect = card.getBoundingClientRect();
                     const x = e.clientX - rect.left;
                     const y = e.clientY - rect.top;
-                    const centerX = rect.width / 2;
-                    const centerY = rect.height / 2;
-                    const rotateX = (y - centerY) / 10;
-                    const rotateY = (centerX - x) / 10;
-                    
+                    const rotateX = (y - rect.height / 2) / 10;
+                    const rotateY = (rect.width / 2 - x) / 10;
                     card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
                 });
-                
                 card.addEventListener('mouseleave', () => {
                     card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0)';
                 });
             });
         }
 
-        // Hover card spotlight effect - Desktop only
-        if (!isTouchDevice) {
-            document.querySelectorAll('.hover-card').forEach(card => {
-                card.addEventListener('mousemove', (e) => {
-                    const rect = card.getBoundingClientRect();
-                    const x = ((e.clientX - rect.left) / rect.width) * 100;
-                    const y = ((e.clientY - rect.top) / rect.height) * 100;
-                    card.style.setProperty('--mouse-x', x + '%');
-                    card.style.setProperty('--mouse-y', y + '%');
-                });
-            });
-        }
-
-        // Prevent zoom on double tap for iOS
+        // Prevent zoom on double tap
         let lastTouchEnd = 0;
         document.addEventListener('touchend', (e) => {
             const now = Date.now();
-            if (now - lastTouchEnd <= 300) {
-                e.preventDefault();
-            }
+            if (now - lastTouchEnd <= 300) e.preventDefault();
             lastTouchEnd = now;
         }, false);
 
-        // Smooth scroll polyfill
         if (!window.ScrollToPlugin) {
             window.ScrollToPlugin = {
                 scrollTo: function(obj) {
-                    const element = typeof obj.y === 'number' ? 
-                        { offsetTop: obj.y } : 
-                        document.querySelector(obj.y);
-                    if (element) {
-                        window.scrollTo({ top: element.offsetTop, behavior: 'smooth' });
-                    }
+                    const element = typeof obj.y === 'number' ? { offsetTop: obj.y } : document.querySelector(obj.y);
+                    if (element) window.scrollTo({ top: element.offsetTop, behavior: 'smooth' });
                 }
             };
         }
