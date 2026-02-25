@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Abhyudaya</title>
+
+    <!-- Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+
+    <!-- Load Data -->
+    <script src="../data.js"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #ff6b00;
+            --secondary: #d4af37;
+            --blue: #1e3a8a;
+            --dark: #050505;
+            --panel: #111111;
+            --light: #ffffff;
+            --border: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            background: var(--dark);
+            color: var(--light);
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: var(--panel);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            padding: 2rem 1rem;
+            z-index: 10;
+        }
+
+        .logo {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 2rem;
+            padding: 0 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo i {
+            color: var(--primary);
+            font-size: 2rem;
+        }
+
+        .nav-items {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .nav-item {
+            padding: 1rem;
+            border-radius: 0.75rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 500;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: rgba(255, 107, 0, 0.1);
+            color: var(--primary);
+        }
+
+        /* Main Content */
+        .main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: radial-gradient(circle at top right, rgba(255, 107, 0, 0.05), transparent 50%),
+                radial-gradient(circle at bottom left, rgba(30, 58, 138, 0.05), transparent 50%);
+        }
+
+        .header {
+            padding: 1.5rem 3rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(17, 17, 17, 0.8);
+            backdrop-filter: blur(20px);
+            z-index: 10;
+        }
+
+        .header h1 {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(255, 107, 0, 0.3);
+        }
+
+        .content {
+            flex: 1;
+            padding: 3rem;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .section-panel {
+            display: none;
+            animation: fadeIn 0.4s ease;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .section-panel.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            color: white;
+            font-family: inherit;
+            font-size: 1rem;
+            transition: border-color 0.3s, background 0.3s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .card-editor {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border);
+            padding: 2rem;
+            border-radius: 1rem;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .card-editor h3 {
+            margin-bottom: 1.5rem;
+            font-family: 'Syne', sans-serif;
+            color: var(--secondary);
+        }
+
+        /* Image Preview */
+        .img-preview {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            border: 1px solid var(--border);
+            background: #222;
+        }
+
+        .hint {
+            font-size: 0.75rem;
+            color: var(--secondary);
+            margin-top: 0.25rem;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo">
+            <i class="ri-settings-4-fill"></i>
+            Admin Panel
+        </div>
+        <div class="nav-items" id="navItems">
+            <div class="nav-item active" data-target="hero"><i class="ri-layout-top-line"></i> Hero Section</div>
+            <div class="nav-item" data-target="uspBanner"><i class="ri-flag-line"></i> USP Banner</div>
+            <div class="nav-item" data-target="stats"><i class="ri-bar-chart-box-line"></i> Statistics</div>
+            <div class="nav-item" data-target="about"><i class="ri-information-line"></i> About Us</div>
+            <div class="nav-item" data-target="programs"><i class="ri-book-open-line"></i> Programs</div>
+            <div class="nav-item" data-target="testimonials"><i class="ri-chat-quote-line"></i> Testimonials</div>
+            <div class="nav-item" data-target="studentLife"><i class="ri-user-smile-line"></i> Student Life</div>
+            <div class="nav-item" data-target="videos"><i class="ri-video-line"></i> Videos (YouTube)</div>
+            <div class="nav-item" data-target="gallery"><i class="ri-image-line"></i> Gallery (Photos)</div>
+            <div class="nav-item" data-target="contact"><i class="ri-contacts-line"></i> Contact Info</div>
+            <a href="../index.html" class="nav-item" target="_blank" style="margin-top:auto; text-decoration:none;"><i
+                    class="ri-external-link-line"></i> View Website</a>
+        </div>
+    </div>
+
+    <!-- Main -->
+    <div class="main">
+        <div class="header">
+            <h1 id="pageTitle">Hero Section</h1>
+            <div style="display:flex; gap: 1rem;">
+                <button class="btn-primary" onclick="window.location.reload()"
+                    style="background:transparent; border: 1px solid var(--border);">
+                    <i class="ri-refresh-line"></i> Discard
+                </button>
+                <button class="btn-primary" onclick="saveData()">
+                    <i class="ri-save-line"></i> Save Changes
+                </button>
+            </div>
+        </div>
+        <div class="content" id="contentArea">
+            <!-- Dynamically populated -->
+        </div>
+    </div>
+
+    <script>
+        const STATE = JSON.parse(JSON.stringify(window.SITE_DATA)); // Deep copy for editing
+
+        // Form templates
+        const renderInput = (label, path, value, hint = '') => `
+            <div class="form-group">
+                <label>${label}</label>
+                <input type="text" class="form-control" value="${value}" oninput="updateState('${path}', this.value)">
+                ${hint ? `<div class="hint">${hint}</div>` : ''}
+            </div>
+        `;
+        const renderTextarea = (label, path, value) => `
+            <div class="form-group">
+                <label>${label}</label>
+                <textarea class="form-control" oninput="updateState('${path}', this.value)">${value}</textarea>
+            </div>
+        `;
+
+        function updateState(path, value) {
+            const parts = path.split('.');
+            let obj = STATE;
+            for (let i = 0; i < parts.length - 1; i++) {
+                if (!obj[parts[i]]) obj[parts[i]] = {};
+                obj = obj[parts[i]];
+            }
+            obj[parts[parts.length - 1]] = value;
+        }
+
+        function updateImagePreview(id, value) {
+            const img = document.getElementById(id);
+            if (img) img.src = value;
+        }
+
+        const sections = {
+            hero: () => `
+                <div class="card-editor">
+                    <h3>Hero Content</h3>
+                    ${renderInput('Badge Text', 'hero.badgeText', STATE.hero.badgeText)}
+                    ${renderInput('Title Line 1', 'hero.titleLine1', STATE.hero.titleLine1)}
+                    ${renderInput('Title Line 2 (Gradient)', 'hero.titleLine2', STATE.hero.titleLine2)}
+                    ${renderTextarea('Subtitle', 'hero.subtitle', STATE.hero.subtitle)}
+                    ${renderInput('Location', 'hero.location', STATE.hero.location)}
+                </div>
+            `,
+            uspBanner: () => `
+                <div class="card-editor">
+                    <h3>USP Banner</h3>
+                    ${renderInput('Title Line 1 (Use • to separate highlight)', 'uspBanner.titleLine1', STATE.uspBanner.titleLine1)}
+                    ${renderInput('Title Line 2', 'uspBanner.titleLine2', STATE.uspBanner.titleLine2)}
+                    ${renderTextarea('Description', 'uspBanner.description', STATE.uspBanner.description)}
+                </div>
+            `,
+            stats: () => STATE.stats.map((s, i) => `
+                <div class="card-editor">
+                    <h3>Stat ${i + 1}</h3>
+                    ${renderInput('Count (Number)', 'stats.' + i + '.count', s.count)}
+                    ${renderInput('Label', 'stats.' + i + '.label', s.label)}
+                </div>
+            `).join(''),
+            about: () => `
+                <div class="card-editor">
+                    <h3>Section Headers</h3>
+                    ${renderInput('Tag', 'about.tag', STATE.about.tag)}
+                    ${renderInput('Title', 'about.title', STATE.about.title)}
+                    ${renderTextarea('Subtitle', 'about.subtitle', STATE.about.subtitle)}
+                </div>
+                ${STATE.about.cards.map((c, i) => `
+                    <div class="card-editor">
+                        <h3>Card ${i + 1}</h3>
+                        ${renderInput('Remix Icon Class (e.g. ri-award-line)', 'about.cards.' + i + '.icon', c.icon)}
+                        ${renderInput('Title', 'about.cards.' + i + '.title', c.title)}
+                        ${renderTextarea('Description', 'about.cards.' + i + '.description', c.description)}
+                    </div>
+                `).join('')}
+            `,
+            programs: () => `
+                <div class="card-editor">
+                    <h3>Section Headers</h3>
+                    ${renderInput('Tag', 'programs.tag', STATE.programs.tag)}
+                    ${renderInput('Title', 'programs.title', STATE.programs.title)}
+                    ${renderTextarea('Subtitle', 'programs.subtitle', STATE.programs.subtitle)}
+                </div>
+                ${STATE.programs.cards.map((c, i) => `
+                    <div class="card-editor">
+                        <h3>Program ${i + 1}</h3>
+                        ${renderInput('Title', 'programs.cards.' + i + '.title', c.title)}
+                        ${renderTextarea('Description', 'programs.cards.' + i + '.description', c.description)}
+                    </div>
+                `).join('')}
+            `,
+            testimonials: () => STATE.testimonials.map((t, i) => `
+                <div class="card-editor">
+                    <h3>Testimonial ${i + 1}</h3>
+                    ${renderInput('Initials (Avatar)', 'testimonials.' + i + '.avatar', t.avatar)}
+                    ${renderInput('Name', 'testimonials.' + i + '.name', t.name)}
+                    ${renderInput('Role', 'testimonials.' + i + '.role', t.role)}
+                    ${renderTextarea('Quote', 'testimonials.' + i + '.text', t.text)}
+                </div>
+            `).join(''),
+            studentLife: () => STATE.studentLife.map((s, i) => `
+                <div class="card-editor">
+                    <h3>Activity ${i + 1}</h3>
+                    <img src="${s.image}" class="img-preview" id="preview-life-${i}">
+                    <div class="form-group">
+                        <label>ImageKit/Photo URL</label>
+                        <input type="text" class="form-control" value="${s.image}" 
+                            oninput="updateState('studentLife.${i}.image', this.value); updateImagePreview('preview-life-${i}', this.value)">
+                        <div class="hint">Use ImageKit API URLs here for optimized images.</div>
+                    </div>
+                    ${renderInput('Title', 'studentLife.' + i + '.title', s.title)}
+                    ${renderTextarea('Description', 'studentLife.' + i + '.description', s.description)}
+                </div>
+            `).join(''),
+            videos: () => STATE.videos.map((v, i) => `
+                <div class="card-editor">
+                    <h3>Video Page ${i + 1}</h3>
+                    <img src="${v.thumbnail}" class="img-preview" id="preview-vid-${i}">
+                    <div class="form-group">
+                        <label>Thumbnail Image URL (ImageKit)</label>
+                        <input type="text" class="form-control" value="${v.thumbnail}" 
+                            oninput="updateState('videos.${i}.thumbnail', this.value); updateImagePreview('preview-vid-${i}', this.value)">
+                    </div>
+                    ${renderInput('YouTube Video ID / URL', 'videos.' + i + '.videoId', v.videoId, 'Paste full YouTube URL or just the ID')}
+                    ${renderInput('Video Title', 'videos.' + i + '.title', v.title)}
+                    ${renderInput('Video Subtitle', 'videos.' + i + '.subtitle', v.subtitle)}
+                    <hr style="border-color:var(--border); margin: 1.5rem 0;">
+                    <h4>Back of Page Info</h4>
+                    ${renderInput('Back Title', 'videos.' + i + '.backTitle', v.backTitle)}
+                    ${renderTextarea('Back Description', 'videos.' + i + '.backDesc', v.backDesc)}
+                </div>
+            `).join(''),
+            gallery: () => STATE.gallery.map((g, i) => `
+                <div class="card-editor">
+                    <h3>Gallery Image ${i + 1}</h3>
+                    <img src="${g.image}" class="img-preview" id="preview-gal-${i}">
+                    <div class="form-group">
+                        <label>Image URL (ImageKit)</label>
+                        <input type="text" class="form-control" value="${g.image}" 
+                            oninput="updateState('gallery.${i}.image', this.value); updateImagePreview('preview-gal-${i}', this.value)">
+                    </div>
+                    ${renderInput('Title', 'gallery.' + i + '.title', g.title)}
+                    ${renderInput('Subtitle', 'gallery.' + i + '.subtitle', g.subtitle)}
+                </div>
+            `).join(''),
+            contact: () => `
+                <div class="card-editor">
+                    <h3>Contact Information</h3>
+                    ${renderInput('Phone Number (Link)', 'contact.phone', STATE.contact.phone)}
+                    ${renderInput('Phone Number (Display)', 'contact.phoneDisplay', STATE.contact.phoneDisplay)}
+                    ${renderInput('WhatsApp Number (with country code)', 'contact.whatsapp', STATE.contact.whatsapp)}
+                    ${renderInput('Email Address', 'contact.email', STATE.contact.email)}
+                    ${renderInput('Physical Address', 'contact.address', STATE.contact.address)}
+                    ${renderTextarea('Form Description Text', 'contact.locationDesc', STATE.contact.locationDesc)}
+                </div>
+            `
+        };
+
+        const contentArea = document.getElementById('contentArea');
+        const pageTitle = document.getElementById('pageTitle');
+
+        function loadSection(id, title) {
+            pageTitle.innerText = title;
+            contentArea.innerHTML = `<div class="section-panel active">${sections[id]()}</div>`;
+        }
+
+        // Nav click logic
+        document.querySelectorAll('.nav-item').forEach(item => {
+            if (!item.hasAttribute('data-target')) return;
+            item.addEventListener('click', (e) => {
+                document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+                item.classList.add('active');
+                loadSection(item.getAttribute('data-target'), item.innerText);
+            });
+        });
+
+        // Save logic
+        function saveData() {
+            localStorage.setItem('abhyudaya_data', JSON.stringify(STATE));
+            alert('Changes saved successfully to browser storage! You can now View Website to see the changes.\n\nOptionally, you can click OK to download the data.js file to keep changes permanently in your code.');
+            exportData();
+        }
+
+        function exportData() {
+            const jsContent = `const DEFAULT_SITE_DATA = ${JSON.stringify(STATE, null, 4)}; \n\nwindow.SITE_DATA = JSON.parse(localStorage.getItem('abhyudaya_data')) || DEFAULT_SITE_DATA; \n`;
+
+            const dataStr = "data:text/javascript;charset=utf-8," + encodeURIComponent(jsContent);
+            const downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.setAttribute("href", dataStr);
+            downloadAnchorNode.setAttribute("download", "data.js");
+            document.body.appendChild(downloadAnchorNode);
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
+        }
+
+        // Load initially
+        loadSection('hero', 'Hero Section');
+    </script>
+</body>
+
+</html>
