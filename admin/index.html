@@ -344,18 +344,87 @@
         const renderImageUploader = (label, path, value, idPrefix) => `
             <div class="form-group">
                 <label>${label}</label>
-                <div style="background: rgba(255, 107, 0, 0.05); border: 1px dashed var(--primary); padding: 1.5rem; text-align: center; border-radius: 0.5rem; margin-bottom: 0.5rem;">
-                    <i class="ri-cloud-upload-line" style="font-size: 2rem; color: var(--primary);"></i>
-                    <p style="margin-top: 0.5rem; color: rgba(255,255,255,0.7); font-size: 0.875rem;">
-                        <strong>Upload Your Image Using ImageKit</strong><br>
-                        To save GitHub space, upload your image to ImageKit.io via their dashboard, then paste the generated URL into the box below.
-                    </p>
+                <div style="background: rgba(255, 107, 0, 0.05); border: 1px dashed var(--primary); padding: 1.5rem; text-align: center; border-radius: 0.5rem; margin-bottom: 0.5rem; position: relative;" id="upload-box-${idPrefix}">
+                    <div id="upload-text-${idPrefix}">
+                        <i class="ri-image-add-line" style="font-size: 2rem; color: var(--primary);"></i>
+                        <p style="margin-top: 0.5rem; color: rgba(255,255,255,0.7); font-size: 0.875rem;">
+                            <strong>Upload directly to ImageKit</strong><br>
+                            Click to auto-upload. Files are compressed instantly!
+                        </p>
+                    </div>
+                    <input type="file" accept="image/*" style="position:absolute; top:0; left:0; width:100%; height:100%; opacity:0; cursor:pointer;" 
+                        onchange="uploadToImageKit(this, '${path}', '${idPrefix}')">
                 </div>
                 <input type="text" class="form-control" value="${value}" placeholder="Paste ImageKit URL here..."
                     oninput="updateState('${path}', this.value); updateImagePreview('preview-${idPrefix}', this.value)"
                     id="url-${idPrefix}">
             </div>
         `;
+
+        async function uploadToImageKit(inputElement, statePath, idPrefix) {
+            const file = inputElement.files[0];
+            if (!file) return;
+
+            if (file.size > 25 * 1024 * 1024) {
+                alert("File is too large! Please upload files under 25MB.");
+                return;
+            }
+
+            let privateKey = localStorage.getItem('imagekit_private_key');
+            if (!privateKey) {
+                privateKey = prompt("Please enter your ImageKit Private Key exactly as it appears in your developer dashboard to enable direct uploads:\\n(We only save this locally in your browser, it will not be uploaded to GitHub)\\n\\nIt usually looks like: private_xxx=");
+                if (!privateKey) {
+                    inputElement.value = '';
+                    return;
+                }
+                localStorage.setItem('imagekit_private_key', privateKey.trim());
+            }
+            privateKey = privateKey.trim();
+
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('fileName', file.name);
+            formData.append('folder', '/abhyudaya');
+
+            const uploadTextDiv = document.getElementById('upload-text-' + idPrefix);
+            const originalHTML = uploadTextDiv.innerHTML;
+            uploadTextDiv.innerHTML = `<i class="ri-loader-4-line ri-spin" style="font-size: 2rem; color: var(--primary);"></i><p style="margin-top: 0.5rem; color: rgba(255,255,255,0.7); font-size: 0.875rem;">Uploading and Compressing...</p>`;
+            inputElement.style.display = 'none';
+
+            try {
+                const response = await fetch('https://upload.imagekit.io/api/v1/files/upload', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Basic ' + btoa(privateKey + ':')
+                    },
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    if (response.status === 401 || response.status === 403) {
+                        localStorage.removeItem('imagekit_private_key');
+                    }
+                    const errorResponse = await response.json().catch(() => ({}));
+                    throw new Error(errorResponse.message || 'Upload failed. Check your API Key.');
+                }
+
+                const result = await response.json();
+
+                updateState(statePath, result.url);
+                updateImagePreview('preview-' + idPrefix, result.url);
+
+                const urlInput = document.getElementById('url-' + idPrefix);
+                if (urlInput) urlInput.value = result.url;
+
+            } catch (error) {
+                console.error(error);
+                alert("Error: " + error.message + "\\n\\nIf you entered the wrong key, we've cleared it so you can try again.");
+            } finally {
+                uploadTextDiv.innerHTML = originalHTML;
+                inputElement.style.display = 'block';
+                inputElement.value = '';
+            }
+        }
 
         function updateState(path, value) {
             const parts = path.split('.');
@@ -404,42 +473,42 @@
 
         const sections = {
             hero: () => `
-                <div class="card-editor">
+                < div class="card-editor" >
                     <h3>Hero Content</h3>
                     ${renderInput('Badge Text', 'hero.badgeText', STATE.hero.badgeText)}
                     ${renderInput('Title Line 1', 'hero.titleLine1', STATE.hero.titleLine1)}
                     ${renderInput('Title Line 2 (Gradient)', 'hero.titleLine2', STATE.hero.titleLine2)}
                     ${renderTextarea('Subtitle', 'hero.subtitle', STATE.hero.subtitle)}
                     ${renderInput('Location', 'hero.location', STATE.hero.location)}
-                </div>
-            `,
+                </div >
+                `,
             uspBanner: () => `
-                <div class="card-editor">
+                < div class="card-editor" >
                     <h3>USP Banner</h3>
                     ${renderInput('Title Line 1 (Use • to separate highlight)', 'uspBanner.titleLine1', STATE.uspBanner.titleLine1)}
                     ${renderInput('Title Line 2', 'uspBanner.titleLine2', STATE.uspBanner.titleLine2)}
                     ${renderTextarea('Description', 'uspBanner.description', STATE.uspBanner.description)}
-                </div>
-            `,
+                </div >
+                `,
             stats: () => STATE.stats.map((s, i) => `
-                <div class="card-editor">
+                < div class="card-editor" >
                     <h3>Stat ${i + 1}</h3>
                     <button class="btn-danger" style="position:absolute; top:1.5rem; right:2rem; margin-top:0;" onclick="deleteItem('stats', ${i})"><i class="ri-delete-bin-line"></i> Delete</button>
                     ${renderInput('Count (Number)', 'stats.' + i + '.count', s.count)}
                     ${renderInput('Label', 'stats.' + i + '.label', s.label)}
-                </div>
-            `).join('') + `
-            <button class="add-new-btn" onclick='addItem("stats", {count: 0, label: "New Stat"})'>
-                <i class="ri-add-line"></i> Add New Statistic
-            </button>
-            `,
+                </div >
+                `).join('') + `
+                < button class="add-new-btn" onclick = 'addItem("stats", {count: 0, label: "New Stat"})' >
+                    <i class="ri-add-line"></i> Add New Statistic
+            </button >
+                `,
             about: () => `
-                <div class="card-editor">
+                < div class="card-editor" >
                     <h3>Section Headers</h3>
                     ${renderInput('Tag', 'about.tag', STATE.about.tag)}
                     ${renderInput('Title', 'about.title', STATE.about.title)}
                     ${renderTextarea('Subtitle', 'about.subtitle', STATE.about.subtitle)}
-                </div>
+                </div >
                 ${STATE.about.cards.map((c, i) => `
                     <div class="card-editor">
                         <h3>Card ${i + 1}</h3>
@@ -448,18 +517,19 @@
                         ${renderInput('Title', 'about.cards.' + i + '.title', c.title)}
                         ${renderTextarea('Description', 'about.cards.' + i + '.description', c.description)}
                     </div>
-                `).join('')}
-                <button class="add-new-btn" onclick='addItem("about.cards", {icon: "ri-star-line", title: "New Feature", description: "Describe the feature..."})'>
-                    <i class="ri-add-line"></i> Add New Value Card
-                </button>
+                `).join('')
+                }
+            <button class="add-new-btn" onclick='addItem("about.cards", {icon: "ri-star-line", title: "New Feature", description: "Describe the feature..."})'>
+                <i class="ri-add-line"></i> Add New Value Card
+            </button>
             `,
             programs: () => `
-                <div class="card-editor">
+                < div class="card-editor" >
                     <h3>Section Headers</h3>
                     ${renderInput('Tag', 'programs.tag', STATE.programs.tag)}
                     ${renderInput('Title', 'programs.title', STATE.programs.title)}
                     ${renderTextarea('Subtitle', 'programs.subtitle', STATE.programs.subtitle)}
-                </div>
+                </div >
                 ${STATE.programs.cards.map((c, i) => `
                     <div class="card-editor">
                         <h3>Program ${i + 1}</h3>
@@ -467,27 +537,28 @@
                         ${renderInput('Title', 'programs.cards.' + i + '.title', c.title)}
                         ${renderTextarea('Description', 'programs.cards.' + i + '.description', c.description)}
                     </div>
-                `).join('')}
-                <button class="add-new-btn" onclick='addItem("programs.cards", {title: "New Program", description: "Program details..."})'>
-                    <i class="ri-add-line"></i> Add New Program
-                </button>
+                `).join('')
+                }
+            <button class="add-new-btn" onclick='addItem("programs.cards", {title: "New Program", description: "Program details..."})'>
+                <i class="ri-add-line"></i> Add New Program
+            </button>
             `,
             testimonials: () => STATE.testimonials.map((t, i) => `
-                <div class="card-editor">
+                < div class="card-editor" >
                     <h3>Testimonial ${i + 1}</h3>
                     <button class="btn-danger" style="position:absolute; top:1.5rem; right:2rem; margin-top:0;" onclick="deleteItem('testimonials', ${i})"><i class="ri-delete-bin-line"></i> Delete</button>
                     ${renderInput('Initials (Avatar)', 'testimonials.' + i + '.avatar', t.avatar)}
                     ${renderInput('Name', 'testimonials.' + i + '.name', t.name)}
                     ${renderInput('Role', 'testimonials.' + i + '.role', t.role)}
                     ${renderTextarea('Quote', 'testimonials.' + i + '.text', t.text)}
-                </div>
-            `).join('') + `
-                <button class="add-new-btn" onclick='addItem("testimonials", {avatar: "A", name: "New Person", role: "Role", text: "Quote..."})'>
+                </div >
+                `).join('') + `
+                < button class="add-new-btn" onclick = 'addItem("testimonials", {avatar: "A", name: "New Person", role: "Role", text: "Quote..."})' >
                     <i class="ri-add-line"></i> Add New Testimonial
-                </button>
-            `,
+                </button >
+                `,
             studentLife: () => STATE.studentLife.map((s, i) => `
-                <div class="card-editor">
+                < div class="card-editor" >
                     <h3>Activity ${i + 1}</h3>
                     <button class="btn-danger" style="position:absolute; top:1.5rem; right:2rem; margin-top:0;" onclick="deleteItem('studentLife', ${i})"><i class="ri-delete-bin-line"></i> Delete</button>
                     <img src="${s.image}" class="img-preview" id="preview-life-${i}">
@@ -496,12 +567,12 @@
                     ${renderTextarea('Description', 'studentLife.' + i + '.description', s.description)}
                 </div>
             `).join('') + `
-                <button class="add-new-btn" onclick='addItem("studentLife", {image: "https://ik.imagekit.io/abhyudaya/default.jpg", title: "New Activity", description: "Description..."})'>
+                < button class="add-new-btn" onclick = 'addItem("studentLife", {image: "https://ik.imagekit.io/abhyudaya/default.jpg", title: "New Activity", description: "Description..."})' >
                     <i class="ri-add-line"></i> Add New Activity
-                </button>
-            `,
+                </button >
+                `,
             videos: () => STATE.videos.map((v, i) => `
-                <div class="card-editor">
+                < div class="card-editor" >
                     <h3>Video Page ${i + 1}</h3>
                     <button class="btn-danger" style="position:absolute; top:1.5rem; right:2rem; margin-top:0;" onclick="deleteItem('videos', ${i})"><i class="ri-delete-bin-line"></i> Delete</button>
                     <img src="${v.thumbnail}" class="img-preview" id="preview-vid-${i}">
