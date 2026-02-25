@@ -344,33 +344,18 @@
         const renderImageUploader = (label, path, value, idPrefix) => `
             <div class="form-group">
                 <label>${label}</label>
-                <input type="file" accept="image/*" class="form-control" style="margin-bottom: 0.5rem;" 
-                    onchange="uploadImage(this, '${path}', 'preview-${idPrefix}')">
-                <input type="text" class="form-control" value="${value}" placeholder="Or paste Image URL here"
-                    oninput="updateState('${path}', this.value); updateImagePreview('preview-${idPrefix}', this.value)">
-                <div class="hint">Upload a file directly, or use an ImageKit / standard URL.</div>
+                <div style="background: rgba(255, 107, 0, 0.05); border: 1px dashed var(--primary); padding: 1.5rem; text-align: center; border-radius: 0.5rem; margin-bottom: 0.5rem;">
+                    <i class="ri-cloud-upload-line" style="font-size: 2rem; color: var(--primary);"></i>
+                    <p style="margin-top: 0.5rem; color: rgba(255,255,255,0.7); font-size: 0.875rem;">
+                        <strong>Upload Your Image Using ImageKit</strong><br>
+                        To save GitHub space, upload your image to ImageKit.io via their dashboard, then paste the generated URL into the box below.
+                    </p>
+                </div>
+                <input type="text" class="form-control" value="${value}" placeholder="Paste ImageKit URL here..."
+                    oninput="updateState('${path}', this.value); updateImagePreview('preview-${idPrefix}', this.value)"
+                    id="url-${idPrefix}">
             </div>
         `;
-
-        // Configure ImageKit (Replace with your actual ImageKit keys if you want server-side saving, 
-        // but for pure frontend we use a free image upload service or direct base64 for simplicity in static sites.
-        // For a static site, we will convert the image to a Base64 string so it can be saved in the JSON data directly)
-        function uploadImage(inputElement, statePath, previewId) {
-            const file = inputElement.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                const base64String = e.target.result;
-                updateState(statePath, base64String);
-                updateImagePreview(previewId, base64String);
-
-                // Update the text input adjacent to it to show it's using local data
-                const textInput = inputElement.nextElementSibling;
-                if (textInput) textInput.value = "(Local Image Data - " + file.name + ")";
-            };
-            reader.readAsDataURL(file);
-        }
 
         function updateState(path, value) {
             const parts = path.split('.');
