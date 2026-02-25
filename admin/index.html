@@ -370,42 +370,44 @@
                 return;
             }
 
-            let privateKey = localStorage.getItem('imagekit_private_key');
-            if (!privateKey) {
-                privateKey = prompt("Please enter your ImageKit Private Key exactly as it appears in your developer dashboard to enable direct uploads:\\n(We only save this locally in your browser, it will not be uploaded to GitHub)\\n\\nIt usually looks like: private_xxx=");
-                if (!privateKey) {
-                    inputElement.value = '';
-                    return;
-                }
-                localStorage.setItem('imagekit_private_key', privateKey.trim());
-            }
-            privateKey = privateKey.trim();
-
-            const formData = new FormData();
-            formData.append('file', file);
-            formData.append('fileName', file.name);
-            formData.append('folder', '/abhyudaya');
-
             const uploadTextDiv = document.getElementById('upload-text-' + idPrefix);
             const originalHTML = uploadTextDiv.innerHTML;
-            uploadTextDiv.innerHTML = `<i class="ri-loader-4-line ri-spin" style="font-size: 2rem; color: var(--primary);"></i><p style="margin-top: 0.5rem; color: rgba(255,255,255,0.7); font-size: 0.875rem;">Uploading and Compressing...</p>`;
+            uploadTextDiv.innerHTML = `<i class="ri-loader-4-line ri-spin" style="font-size: 2rem; color: var(--primary);"></i><p style="margin-top: 0.5rem; color: rgba(255,255,255,0.7); font-size: 0.875rem;">Connecting to Cloudflare Secure Auth...</p>`;
             inputElement.style.display = 'none';
 
             try {
+                // 1. Get secure auth signature from Cloudflare Pages Function
+                const authRes = await fetch('/api/imagekit-auth');
+                if (!authRes.ok) {
+                    const errObj = await authRes.json().catch(() => ({}));
+                    throw new Error(errObj.error || "Could not fetch secure credentials. Did you set IMAGEKIT_PRIVATE_KEY and IMAGEKIT_PUBLIC_KEY in Cloudflare Pages Settings?");
+                }
+                const authData = await authRes.json();
+
+                if (!authData.signature || !authData.publicKey) {
+                    throw new Error("Invalid Auth parameters returned from Cloudflare.");
+                }
+
+                uploadTextDiv.innerHTML = `<i class="ri-loader-4-line ri-spin" style="font-size: 2rem; color: var(--primary);"></i><p style="margin-top: 0.5rem; color: rgba(255,255,255,0.7); font-size: 0.875rem;">Uploading and Compressing...</p>`;
+
+                // 2. Upload to ImageKit using client-side auth
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('fileName', file.name);
+                formData.append('folder', '/abhyudaya');
+                formData.append('publicKey', authData.publicKey);
+                formData.append('signature', authData.signature);
+                formData.append('expire', authData.expire);
+                formData.append('token', authData.token);
+
                 const response = await fetch('https://upload.imagekit.io/api/v1/files/upload', {
                     method: 'POST',
-                    headers: {
-                        'Authorization': 'Basic ' + btoa(privateKey + ':')
-                    },
                     body: formData
                 });
 
                 if (!response.ok) {
-                    if (response.status === 401 || response.status === 403) {
-                        localStorage.removeItem('imagekit_private_key');
-                    }
                     const errorResponse = await response.json().catch(() => ({}));
-                    throw new Error(errorResponse.message || 'Upload failed. Check your API Key.');
+                    throw new Error(errorResponse.message || 'Upload failed due to ImageKit error.');
                 }
 
                 const result = await response.json();
@@ -418,7 +420,7 @@
 
             } catch (error) {
                 console.error(error);
-                alert("Error: " + error.message + "\\n\\nIf you entered the wrong key, we've cleared it so you can try again.");
+                alert("Upload Error: " + error.message);
             } finally {
                 uploadTextDiv.innerHTML = originalHTML;
                 inputElement.style.display = 'block';
