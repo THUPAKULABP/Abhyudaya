@@ -237,6 +237,46 @@
             color: var(--secondary);
             margin-top: 0.25rem;
         }
+
+        .btn-danger {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 1rem;
+        }
+
+        .btn-danger:hover {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: #ef4444;
+        }
+
+        .add-new-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px dashed var(--border);
+            color: white;
+            width: 100%;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            cursor: pointer;
+            font-size: 1.125rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: all 0.3s;
+            margin-bottom: 2rem;
+        }
+
+        .add-new-btn:hover {
+            background: rgba(255, 107, 0, 0.1);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
     </style>
 </head>
 
@@ -316,6 +356,36 @@
             if (img) img.src = value;
         }
 
+        function deleteItem(path, index) {
+            if (confirm('Are you sure you want to delete this item?')) {
+                const parts = path.split('.');
+                let obj = STATE;
+                for (let i = 0; i < parts.length - 1; i++) {
+                    obj = obj[parts[i]];
+                }
+                const targetArray = obj[parts[parts.length - 1]];
+                targetArray.splice(index, 1);
+
+                const currentNav = document.querySelector('.nav-item.active').getAttribute('data-target');
+                loadSection(currentNav, document.querySelector('.nav-item.active').innerText);
+            }
+        }
+
+        function addItem(path, defaultTemplate) {
+            const parts = path.split('.');
+            let obj = STATE;
+            for (let i = 0; i < parts.length - 1; i++) {
+                obj = obj[parts[i]];
+            }
+            const targetArray = obj[parts[parts.length - 1]];
+
+            // Deep clone the template
+            targetArray.push(JSON.parse(JSON.stringify(defaultTemplate)));
+
+            const currentNav = document.querySelector('.nav-item.active').getAttribute('data-target');
+            loadSection(currentNav, document.querySelector('.nav-item.active').innerText);
+        }
+
         const sections = {
             hero: () => `
                 <div class="card-editor">
@@ -338,10 +408,15 @@
             stats: () => STATE.stats.map((s, i) => `
                 <div class="card-editor">
                     <h3>Stat ${i + 1}</h3>
+                    <button class="btn-danger" style="position:absolute; top:1.5rem; right:2rem; margin-top:0;" onclick="deleteItem('stats', ${i})"><i class="ri-delete-bin-line"></i> Delete</button>
                     ${renderInput('Count (Number)', 'stats.' + i + '.count', s.count)}
                     ${renderInput('Label', 'stats.' + i + '.label', s.label)}
                 </div>
-            `).join(''),
+            `).join('') + `
+            <button class="add-new-btn" onclick='addItem("stats", {count: 0, label: "New Stat"})'>
+                <i class="ri-add-line"></i> Add New Statistic
+            </button>
+            `,
             about: () => `
                 <div class="card-editor">
                     <h3>Section Headers</h3>
@@ -352,11 +427,15 @@
                 ${STATE.about.cards.map((c, i) => `
                     <div class="card-editor">
                         <h3>Card ${i + 1}</h3>
+                        <button class="btn-danger" style="position:absolute; top:1.5rem; right:2rem; margin-top:0;" onclick="deleteItem('about.cards', ${i})"><i class="ri-delete-bin-line"></i> Delete Card</button>
                         ${renderInput('Remix Icon Class (e.g. ri-award-line)', 'about.cards.' + i + '.icon', c.icon)}
                         ${renderInput('Title', 'about.cards.' + i + '.title', c.title)}
                         ${renderTextarea('Description', 'about.cards.' + i + '.description', c.description)}
                     </div>
                 `).join('')}
+                <button class="add-new-btn" onclick='addItem("about.cards", {icon: "ri-star-line", title: "New Feature", description: "Describe the feature..."})'>
+                    <i class="ri-add-line"></i> Add New Value Card
+                </button>
             `,
             programs: () => `
                 <div class="card-editor">
@@ -368,23 +447,33 @@
                 ${STATE.programs.cards.map((c, i) => `
                     <div class="card-editor">
                         <h3>Program ${i + 1}</h3>
+                        <button class="btn-danger" style="position:absolute; top:1.5rem; right:2rem; margin-top:0;" onclick="deleteItem('programs.cards', ${i})"><i class="ri-delete-bin-line"></i> Delete</button>
                         ${renderInput('Title', 'programs.cards.' + i + '.title', c.title)}
                         ${renderTextarea('Description', 'programs.cards.' + i + '.description', c.description)}
                     </div>
                 `).join('')}
+                <button class="add-new-btn" onclick='addItem("programs.cards", {title: "New Program", description: "Program details..."})'>
+                    <i class="ri-add-line"></i> Add New Program
+                </button>
             `,
             testimonials: () => STATE.testimonials.map((t, i) => `
                 <div class="card-editor">
                     <h3>Testimonial ${i + 1}</h3>
+                    <button class="btn-danger" style="position:absolute; top:1.5rem; right:2rem; margin-top:0;" onclick="deleteItem('testimonials', ${i})"><i class="ri-delete-bin-line"></i> Delete</button>
                     ${renderInput('Initials (Avatar)', 'testimonials.' + i + '.avatar', t.avatar)}
                     ${renderInput('Name', 'testimonials.' + i + '.name', t.name)}
                     ${renderInput('Role', 'testimonials.' + i + '.role', t.role)}
                     ${renderTextarea('Quote', 'testimonials.' + i + '.text', t.text)}
                 </div>
-            `).join(''),
+            `).join('') + `
+                <button class="add-new-btn" onclick='addItem("testimonials", {avatar: "A", name: "New Person", role: "Role", text: "Quote..."})'>
+                    <i class="ri-add-line"></i> Add New Testimonial
+                </button>
+            `,
             studentLife: () => STATE.studentLife.map((s, i) => `
                 <div class="card-editor">
                     <h3>Activity ${i + 1}</h3>
+                    <button class="btn-danger" style="position:absolute; top:1.5rem; right:2rem; margin-top:0;" onclick="deleteItem('studentLife', ${i})"><i class="ri-delete-bin-line"></i> Delete</button>
                     <img src="${s.image}" class="img-preview" id="preview-life-${i}">
                     <div class="form-group">
                         <label>ImageKit/Photo URL</label>
@@ -395,10 +484,15 @@
                     ${renderInput('Title', 'studentLife.' + i + '.title', s.title)}
                     ${renderTextarea('Description', 'studentLife.' + i + '.description', s.description)}
                 </div>
-            `).join(''),
+            `).join('') + `
+                <button class="add-new-btn" onclick='addItem("studentLife", {image: "https://ik.imagekit.io/abhyudaya/default.jpg", title: "New Activity", description: "Description..."})'>
+                    <i class="ri-add-line"></i> Add New Activity
+                </button>
+            `,
             videos: () => STATE.videos.map((v, i) => `
                 <div class="card-editor">
                     <h3>Video Page ${i + 1}</h3>
+                    <button class="btn-danger" style="position:absolute; top:1.5rem; right:2rem; margin-top:0;" onclick="deleteItem('videos', ${i})"><i class="ri-delete-bin-line"></i> Delete</button>
                     <img src="${v.thumbnail}" class="img-preview" id="preview-vid-${i}">
                     <div class="form-group">
                         <label>Thumbnail Image URL (ImageKit)</label>
@@ -413,10 +507,15 @@
                     ${renderInput('Back Title', 'videos.' + i + '.backTitle', v.backTitle)}
                     ${renderTextarea('Back Description', 'videos.' + i + '.backDesc', v.backDesc)}
                 </div>
-            `).join(''),
+            `).join('') + `
+                <button class="add-new-btn" onclick='addItem("videos", {thumbnail: "https://ik.imagekit.io/abhyudaya/default-thumb.jpg", videoId: "dQw4w9WgXcQ", title: "New Video", subtitle: "Subtitle", backTitle: "Back side", backDesc: "Details on the back of the flip page..."})'>
+                    <i class="ri-add-line"></i> Add New Video Page
+                </button>
+            `,
             gallery: () => STATE.gallery.map((g, i) => `
                 <div class="card-editor">
                     <h3>Gallery Image ${i + 1}</h3>
+                    <button class="btn-danger" style="position:absolute; top:1.5rem; right:2rem; margin-top:0;" onclick="deleteItem('gallery', ${i})"><i class="ri-delete-bin-line"></i> Delete</button>
                     <img src="${g.image}" class="img-preview" id="preview-gal-${i}">
                     <div class="form-group">
                         <label>Image URL (ImageKit)</label>
@@ -426,7 +525,11 @@
                     ${renderInput('Title', 'gallery.' + i + '.title', g.title)}
                     ${renderInput('Subtitle', 'gallery.' + i + '.subtitle', g.subtitle)}
                 </div>
-            `).join(''),
+            `).join('') + `
+                <button class="add-new-btn" onclick='addItem("gallery", {image: "https://ik.imagekit.io/abhyudaya/default-gallery.jpg", title: "New Photo", subtitle: "Photo caption"})'>
+                    <i class="ri-add-line"></i> Add New Gallery Image
+                </button>
+            `,
             contact: () => `
                 <div class="card-editor">
                     <h3>Contact Information</h3>
