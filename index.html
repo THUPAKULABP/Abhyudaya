@@ -753,7 +753,195 @@
             font-size: 0.875rem;
         }
         
-        /* FLIPBOOK - FIXED */
+        /* TESTIMONIALS */
+        .testimonials-section {
+            background: linear-gradient(135deg, rgba(255,107,0,0.05), rgba(212,175,55,0.05));
+        }
+        
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2.5rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .testimonial-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 2rem;
+            padding: 2.5rem;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+        
+        .testimonial-card::before {
+            content: '"';
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            font-size: 8rem;
+            color: var(--primary);
+            opacity: 0.1;
+            font-family: Georgia, serif;
+            line-height: 1;
+        }
+        
+        .testimonial-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--primary);
+            box-shadow: 0 30px 60px rgba(255, 107, 0, 0.2);
+        }
+        
+        .testimonial-header {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .testimonial-avatar {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+        
+        .testimonial-info h4 {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.25rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .testimonial-info .role {
+            color: var(--primary);
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+        
+        .testimonial-text {
+            color: rgba(255,255,255,0.8);
+            line-height: 1.8;
+            font-style: italic;
+            margin-bottom: 1.5rem;
+        }
+        
+        .testimonial-rating {
+            display: flex;
+            gap: 0.25rem;
+            color: var(--yellow);
+        }
+        
+        .testimonial-rating i {
+            font-size: 1.25rem;
+        }
+        
+        /* STUDENTS LIFE */
+        .students-life-section {
+            background: linear-gradient(135deg, rgba(30,58,138,0.1), rgba(255,107,0,0.05));
+        }
+        
+        .life-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .life-card {
+            position: relative;
+            border-radius: 2rem;
+            overflow: hidden;
+            aspect-ratio: 4/3;
+            cursor: pointer;
+            transition: all 0.5s;
+        }
+        
+        .life-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.3);
+        }
+        
+        .life-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.8s;
+        }
+        
+        .life-card:hover img {
+            transform: scale(1.1);
+        }
+        
+        .life-card-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 2rem;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+        
+        .life-card:hover .life-card-overlay {
+            opacity: 1;
+        }
+        
+        .life-card h3 {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            transform: translateY(20px);
+            transition: transform 0.5s;
+        }
+        
+        .life-card:hover .life-card h3 {
+            transform: translateY(0);
+        }
+        
+        .life-card p {
+            color: rgba(255,255,255,0.8);
+            transform: translateY(20px);
+            transition: transform 0.5s 0.1s;
+        }
+        
+        .life-card:hover .life-card p {
+            transform: translateY(0);
+        }
+        
+        .life-icon {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            transform: scale(0);
+            transition: transform 0.5s;
+        }
+        
+        .life-card:hover .life-icon {
+            transform: scale(1);
+        }
+        
+        /* FLIPBOOK */
         .flipbook-container {
             max-width: 1000px;
             margin: 0 auto;
@@ -1578,6 +1766,8 @@
             <a href="#home">Home</a>
             <a href="#about">About</a>
             <a href="#programs">Programs</a>
+            <a href="#testimonials">Testimonials</a>
+            <a href="#students-life">Student Life</a>
             <a href="#videos">Videos</a>
             <a href="#gallery">Gallery</a>
             <a href="#contact">Contact</a>
@@ -1733,7 +1923,207 @@
         </div>
     </section>
 
-    <!-- VIDEOS - FIXED FLIPBOOK -->
+    <!-- TESTIMONIALS -->
+    <section id="testimonials" class="testimonials-section">
+        <div class="section-header reveal">
+            <div class="section-tag">Testimonials</div>
+            <h2 class="section-title">What Parents & Students Say</h2>
+            <p class="section-subtitle">
+                Hear from our community about their transformative journey with Abhyudaya
+            </p>
+        </div>
+        
+        <div class="testimonials-grid">
+            <div class="testimonial-card reveal">
+                <div class="testimonial-header">
+                    <div class="testimonial-avatar">RP</div>
+                    <div class="testimonial-info">
+                        <h4>Rajesh Patel</h4>
+                        <p class="role">Parent of Sainik School Student</p>
+                    </div>
+                </div>
+                <p class="testimonial-text">
+                    "Abhyudaya transformed my son's confidence and academic performance. The integrated coaching approach helped him secure admission to Sainik School. The faculty's dedication is remarkable."
+                </p>
+                <div class="testimonial-rating">
+                    <i class="ri-star-fill"></i>
+                    <i class="ri-star-fill"></i>
+                    <i class="ri-star-fill"></i>
+                    <i class="ri-star-fill"></i>
+                    <i class="ri-star-fill"></i>
+                </div>
+            </div>
+
+            <div class="testimonial-card reveal">
+                <div class="testimonial-header">
+                    <div class="testimonial-avatar">SK</div>
+                    <div class="testimonial-info">
+                        <h4>Sunita Kumar</h4>
+                        <p class="role">Parent of Navodaya Student</p>
+                    </div>
+                </div>
+                <p class="testimonial-text">
+                    "The single fee model is a blessing for middle-class families. My daughter got selected for Navodaya Vidyalaya thanks to the excellent coaching and regular mock tests. Highly recommended!"
+                </p>
+                <div class="testimonial-rating">
+                    <i class="ri-star-fill"></i>
+                    <i class="ri-star-fill"></i>
+                    <i class="ri-star-fill"></i>
+                    <i class="ri-star-fill"></i>
+                    <i class="ri-star-fill"></i>
+                </div>
+            </div>
+
+            <div class="testimonial-card reveal">
+                <div class="testimonial-header">
+                    <div class="testimonial-avatar">AR</div>
+                    <div class="testimonial-info">
+                        <h4>Arun Reddy</h4>
+                        <p class="role">Class 10 Student</p>
+                    </div>
+                </div>
+                <p class="testimonial-text">
+                    "The teachers here don't just teach, they inspire. The smart classrooms and practical learning approach made studying enjoyable. I scored 95% in my board exams!"
+                </p>
+                <div class="testimonial-rating">
+                    <i class="ri-star-fill"></i>
+                    <i class="ri-star-fill"></i>
+                    <i class="ri-star-fill"></i>
+                    <i class="ri-star-fill"></i>
+                    <i class="ri-star-fill"></i>
+                </div>
+            </div>
+
+            <div class="testimonial-card reveal">
+                <div class="testimonial-header">
+                    <div class="testimonial-avatar">LM</div>
+                    <div class="testimonial-info">
+                        <h4>Lakshmi Menon</h4>
+                        <p class="role">Parent of RMS Student</p>
+                    </div>
+                </div>
+                <p class="testimonial-text">
+                    "From day one, the school focused on holistic development. My son not only cleared RMS entrance but also developed leadership skills. The physical training program is excellent."
+                </p>
+                <div class="testimonial-rating">
+                    <i class="ri-star-fill"></i>
+                    <i class="ri-star-fill"></i>
+                    <i class="ri-star-fill"></i>
+                    <i class="ri-star-fill"></i>
+                    <i class="ri-star-fill"></i>
+                </div>
+            </div>
+
+            <div class="testimonial-card reveal">
+                <div class="testimonial-header">
+                    <div class="testimonial-avatar">VS</div>
+                    <div class="testimonial-info">
+                        <h4>Venkatesh Sharma</h4>
+                        <p class="role">Alumni - Class of 2020</p>
+                    </div>
+                </div>
+                <p class="testimonial-text">
+                    "Abhyudaya gave me the foundation to excel in competitive exams. The discipline, time management, and study techniques I learned here helped me throughout my engineering journey."
+                </p>
+                <div class="testimonial-rating">
+                    <i class="ri-star-fill"></i>
+                    <i class="ri-star-fill"></i>
+                    <i class="ri-star-fill"></i>
+                    <i class="ri-star-fill"></i>
+                    <i class="ri-star-fill"></i>
+                </div>
+            </div>
+
+            <div class="testimonial-card reveal">
+                <div class="testimonial-header">
+                    <div class="testimonial-avatar">PN</div>
+                    <div class="testimonial-info">
+                        <h4>Priya Nair</h4>
+                        <p class="role">Parent of Regular School Student</p>
+                    </div>
+                </div>
+                <p class="testimonial-text">
+                    "The balance between academics and extracurricular activities is perfect. My daughter enjoys going to school every day. The transport facility and safety measures give us peace of mind."
+                </p>
+                <div class="testimonial-rating">
+                    <i class="ri-star-fill"></i>
+                    <i class="ri-star-fill"></i>
+                    <i class="ri-star-fill"></i>
+                    <i class="ri-star-fill"></i>
+                    <i class="ri-star-fill"></i>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- STUDENTS LIFE -->
+    <section id="students-life" class="students-life-section">
+        <div class="section-header reveal">
+            <div class="section-tag">Student Life</div>
+            <h2 class="section-title">Beyond Academics</h2>
+            <p class="section-subtitle">
+                Experience a vibrant campus life that nurtures creativity, sportsmanship, and personal growth
+            </p>
+        </div>
+        
+        <div class="life-grid">
+            <div class="life-card reveal">
+                <img src="https://images.unsplash.com/photo-1564981797816-1043664bf78d?w=600&h=450&fit=crop" alt="Sports">
+                <div class="life-icon"><i class="ri-trophy-line"></i></div>
+                <div class="life-card-overlay">
+                    <h3>Sports & Athletics</h3>
+                    <p>Annual sports meets, inter-house competitions, and professional coaching in cricket, football, and athletics.</p>
+                </div>
+            </div>
+
+            <div class="life-card reveal">
+                <img src="https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=600&h=450&fit=crop" alt="Cultural">
+                <div class="life-icon"><i class="ri-music-2-line"></i></div>
+                <div class="life-card-overlay">
+                    <h3>Cultural Events</h3>
+                    <p>Annual day celebrations, dance competitions, music concerts, and drama performances that showcase hidden talents.</p>
+                </div>
+            </div>
+
+            <div class="life-card reveal">
+                <img src="https://images.unsplash.com/photo-1531482615713-2afd69097998?w=600&h=450&fit=crop" alt="Science">
+                <div class="life-icon"><i class="ri-flask-line"></i></div>
+                <div class="life-card-overlay">
+                    <h3>Science & Innovation</h3>
+                    <p>Science exhibitions, robotics clubs, coding workshops, and innovation labs to foster scientific temper.</p>
+                </div>
+            </div>
+
+            <div class="life-card reveal">
+                <img src="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=600&h=450&fit=crop" alt="Library">
+                <div class="life-icon"><i class="ri-book-open-line"></i></div>
+                <div class="life-card-overlay">
+                    <h3>Library & Reading</h3>
+                    <p>Well-stocked library with 5000+ books, reading clubs, and literary activities to promote love for reading.</p>
+                </div>
+            </div>
+
+            <div class="life-card reveal">
+                <img src="https://images.unsplash.com/photo-1509062522246-3755977927d7?w=600&h=450&fit=crop" alt="Classroom">
+                <div class="life-icon"><i class="ri-computer-line"></i></div>
+                <div class="life-card-overlay">
+                    <h3>Smart Classrooms</h3>
+                    <p>Digital learning with smart boards, projectors, and interactive sessions for better understanding.</p>
+                </div>
+            </div>
+
+            <div class="life-card reveal">
+                <img src="https://images.unsplash.com/photo-1571260899304-425eee4c7efc?w=600&h=450&fit=crop" alt="Community">
+                <div class="life-icon"><i class="ri-heart-line"></i></div>
+                <div class="life-card-overlay">
+                    <h3>Community Service</h3>
+                    <p>Social outreach programs, environmental initiatives, and value education to build responsible citizens.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- VIDEOS -->
     <section id="videos">
         <div class="section-header reveal">
             <div class="section-tag">Video Gallery</div>
@@ -2020,6 +2410,7 @@
                 <p>
                     <a href="#about"><i class="ri-arrow-right-line"></i> About Us</a>
                     <a href="#programs"><i class="ri-arrow-right-line"></i> Programs</a>
+                    <a href="#testimonials"><i class="ri-arrow-right-line"></i> Testimonials</a>
                     <a href="#gallery"><i class="ri-arrow-right-line"></i> Gallery</a>
                     <a href="#contact"><i class="ri-arrow-right-line"></i> Contact</a>
                 </p>
