@@ -341,6 +341,37 @@
             </div>
         `;
 
+        const renderImageUploader = (label, path, value, idPrefix) => `
+            <div class="form-group">
+                <label>${label}</label>
+                <input type="file" accept="image/*" class="form-control" style="margin-bottom: 0.5rem;" 
+                    onchange="uploadImage(this, '${path}', 'preview-${idPrefix}')">
+                <input type="text" class="form-control" value="${value}" placeholder="Or paste Image URL here"
+                    oninput="updateState('${path}', this.value); updateImagePreview('preview-${idPrefix}', this.value)">
+                <div class="hint">Upload a file directly, or use an ImageKit / standard URL.</div>
+            </div>
+        `;
+
+        // Configure ImageKit (Replace with your actual ImageKit keys if you want server-side saving, 
+        // but for pure frontend we use a free image upload service or direct base64 for simplicity in static sites.
+        // For a static site, we will convert the image to a Base64 string so it can be saved in the JSON data directly)
+        function uploadImage(inputElement, statePath, previewId) {
+            const file = inputElement.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const base64String = e.target.result;
+                updateState(statePath, base64String);
+                updateImagePreview(previewId, base64String);
+
+                // Update the text input adjacent to it to show it's using local data
+                const textInput = inputElement.nextElementSibling;
+                if (textInput) textInput.value = "(Local Image Data - " + file.name + ")";
+            };
+            reader.readAsDataURL(file);
+        }
+
         function updateState(path, value) {
             const parts = path.split('.');
             let obj = STATE;
@@ -475,12 +506,7 @@
                     <h3>Activity ${i + 1}</h3>
                     <button class="btn-danger" style="position:absolute; top:1.5rem; right:2rem; margin-top:0;" onclick="deleteItem('studentLife', ${i})"><i class="ri-delete-bin-line"></i> Delete</button>
                     <img src="${s.image}" class="img-preview" id="preview-life-${i}">
-                    <div class="form-group">
-                        <label>ImageKit/Photo URL</label>
-                        <input type="text" class="form-control" value="${s.image}" 
-                            oninput="updateState('studentLife.${i}.image', this.value); updateImagePreview('preview-life-${i}', this.value)">
-                        <div class="hint">Use ImageKit API URLs here for optimized images.</div>
-                    </div>
+                    ${renderImageUploader('Activity Image', 'studentLife.' + i + '.image', s.image, 'life-' + i)}
                     ${renderInput('Title', 'studentLife.' + i + '.title', s.title)}
                     ${renderTextarea('Description', 'studentLife.' + i + '.description', s.description)}
                 </div>
@@ -494,11 +520,7 @@
                     <h3>Video Page ${i + 1}</h3>
                     <button class="btn-danger" style="position:absolute; top:1.5rem; right:2rem; margin-top:0;" onclick="deleteItem('videos', ${i})"><i class="ri-delete-bin-line"></i> Delete</button>
                     <img src="${v.thumbnail}" class="img-preview" id="preview-vid-${i}">
-                    <div class="form-group">
-                        <label>Thumbnail Image URL (ImageKit)</label>
-                        <input type="text" class="form-control" value="${v.thumbnail}" 
-                            oninput="updateState('videos.${i}.thumbnail', this.value); updateImagePreview('preview-vid-${i}', this.value)">
-                    </div>
+                    ${renderImageUploader('Video Thumbnail Image', 'videos.' + i + '.thumbnail', v.thumbnail, 'vid-' + i)}
                     ${renderInput('YouTube Video ID / URL', 'videos.' + i + '.videoId', v.videoId, 'Paste full YouTube URL or just the ID')}
                     ${renderInput('Video Title', 'videos.' + i + '.title', v.title)}
                     ${renderInput('Video Subtitle', 'videos.' + i + '.subtitle', v.subtitle)}
@@ -517,11 +539,7 @@
                     <h3>Gallery Image ${i + 1}</h3>
                     <button class="btn-danger" style="position:absolute; top:1.5rem; right:2rem; margin-top:0;" onclick="deleteItem('gallery', ${i})"><i class="ri-delete-bin-line"></i> Delete</button>
                     <img src="${g.image}" class="img-preview" id="preview-gal-${i}">
-                    <div class="form-group">
-                        <label>Image URL (ImageKit)</label>
-                        <input type="text" class="form-control" value="${g.image}" 
-                            oninput="updateState('gallery.${i}.image', this.value); updateImagePreview('preview-gal-${i}', this.value)">
-                    </div>
+                    ${renderImageUploader('Gallery Image', 'gallery.' + i + '.image', g.image, 'gal-' + i)}
                     ${renderInput('Title', 'gallery.' + i + '.title', g.title)}
                     ${renderInput('Subtitle', 'gallery.' + i + '.subtitle', g.subtitle)}
                 </div>
