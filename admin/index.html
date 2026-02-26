@@ -101,6 +101,53 @@
             color: var(--primary);
         }
 
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+                height: auto;
+                min-height: 100vh;
+                overflow-x: hidden;
+                overflow-y: auto;
+            }
+
+            .sidebar {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid var(--border);
+                padding: 1rem;
+            }
+
+            .logo {
+                margin-bottom: 1rem;
+            }
+
+            .nav-items {
+                flex-direction: row;
+                overflow-x: auto;
+                padding-bottom: 0.5rem;
+            }
+
+            .nav-item {
+                white-space: nowrap;
+            }
+
+            .main {
+                flex: 1;
+            }
+
+            .header {
+                flex-direction: column;
+                align-items: stretch;
+                padding: 1rem;
+                gap: 1rem;
+            }
+
+            .content {
+                padding: 1rem;
+                overflow: visible;
+            }
+        }
+
         /* Toggle Switch Styling */
         .toggle-wrapper {
             display: flex;
