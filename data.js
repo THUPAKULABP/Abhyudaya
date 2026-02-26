@@ -109,8 +109,19 @@ async function saveSiteData(data) {
     localStorage.setItem('abhyudaya_data', JSON.stringify(data));
     window.SITE_DATA = data;
     if (window.firebaseInitPromise) await window.firebaseInitPromise;
-    if (window.db) {
-        window.db.ref('siteData').set(data).catch(e => console.error("Firebase save error:", e));
+    
+    if (!window.db) {
+        alert("⚠️ CRITICAL WARNING!\n\nFirebase is NOT connected! Your changes are ONLY saved locally on this single device. Visitors will NOT see these changes.\n\nPlease double check your Cloudflare Pages Environment Variables (FIREBASE_API_KEY, FIREBASE_DATABASE_URL, etc).");
+        throw new Error("Firebase not initialized. Saved locally only.");
+    }
+    
+    try {
+        await window.db.ref('siteData').set(data);
+        console.log("Successfully securely saved to Firebase Realtime Database!");
+    } catch (e) {
+        console.error("Firebase save error:", e);
+        alert("⚠️ CRITICAL FIREBASE ERROR!\n\nCould not save to the live database!\nReason: " + e.message + "\n\nPlease ensure your Firebase Realtime Database RULES are set to allow read/write. e.g. '.read': 'true', '.write': 'true'.");
+        throw e;
     }
 }
 

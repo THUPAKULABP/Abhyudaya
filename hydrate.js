@@ -92,6 +92,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     try { hydrateVideos(data); } catch(e) { console.warn('Videos error:', e); }
     try { hydrateGallery(data); } catch(e) { console.warn('Gallery error:', e); }
     try { hydrateContact(data); } catch(e) { console.warn('Contact error:', e); }
+
+    // Re-initialize GSAP animations to account for freshly added items
+    if (typeof window.refreshGSAP === 'function') {
+        window.refreshGSAP();
+    }
 });
 
 /* ═══════════════════════════════════════════════════════════════════

@@ -3101,9 +3101,18 @@
                 delay: 1.5
             });
 
-            // Counter animations
-            gsap.utils.toArray('.stat-number').forEach(stat => {
-                const target = parseInt(stat.getAttribute('data-target'));
+            window.refreshGSAP();
+        }
+
+        window.refreshGSAP = function() {
+            if (typeof ScrollTrigger !== 'undefined') {
+                ScrollTrigger.refresh();
+            }
+
+            // Counter animations (only for new ones)
+            gsap.utils.toArray('.stat-number:not(.gsap-init)').forEach(stat => {
+                stat.classList.add('gsap-init');
+                const target = parseInt(stat.getAttribute('data-target')) || 0;
                 gsap.to(stat, {
                     innerText: target,
                     duration: 2.5,
@@ -3116,8 +3125,9 @@
                 });
             });
 
-            // Scroll animations
-            gsap.utils.toArray('.reveal').forEach(element => {
+            // Scroll animations (only for new ones)
+            gsap.utils.toArray('.reveal:not(.gsap-init)').forEach(element => {
+                element.classList.add('gsap-init');
                 gsap.fromTo(element,
                     { opacity: 0, y: 50 },
                     {
@@ -3133,7 +3143,8 @@
                     }
                 );
             });
-        }
+        };
+
 
         // Navbar scroll effect
         window.addEventListener('scroll', () => {
