@@ -1,20 +1,14 @@
 // firebase-init.js
-// =========================================================
-// REPLACE THESE VALUES WITH YOUR REAL FIREBASE FREE PLAN KEYS
-// 1. Go to console.firebase.google.com
-// 2. Create a Project and add a "Web App"
-// 3. Create a "Realtime Database" in test mode or with security rules
-// 4. Copy the config object details below
-// =========================================================
 
 const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-    databaseURL: "https://YOUR_PROJECT_ID-default-rtdb.firebaseio.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT_ID.appspot.com",
-    messagingSenderId: "123456789",
-    appId: "1:123456789:web:abcdef"
+    apiKey: "AIzaSyDKSV7nv1lpH5us9Dx9t1TZ6lOx6rxepUg",
+    authDomain: "abhyudaya-48536.firebaseapp.com",
+    databaseURL: "https://abhyudaya-48536-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "abhyudaya-48536",
+    storageBucket: "abhyudaya-48536.firebasestorage.app",
+    messagingSenderId: "802149164793",
+    appId: "1:802149164793:web:70847d05da8cd0ad542428",
+    measurementId: "G-Z0MFST47EB"
 };
 
 // Initialize Firebase automatically if SDK is loaded
@@ -22,8 +16,8 @@ if (typeof firebase !== 'undefined') {
     try {
         firebase.initializeApp(firebaseConfig);
         window.db = firebase.database();
-        console.log("Firebase initialized successfully on frontend.");
+        console.log("Firebase initialized successfully with your Realtime Database details.");
     } catch (error) {
-        console.warn("Firebase initialization failed. Did you replace the keys in firebase-init.js?", error);
+        console.warn("Firebase initialization failed:", error);
     }
 }
