@@ -3052,6 +3052,8 @@
                 const speed = (index + 1) * 20;
                 const xOffset = (0.5 - x) * speed;
                 const yOffset = (0.5 - y) * speed;
+                shape.style.transform = `translate(${xOffset}px, ${yOffset}px)`;
+            });
         });
     </script>
 
