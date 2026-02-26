@@ -89,20 +89,35 @@ window.SITE_DATA = JSON.parse(localStorage.getItem('abhyudaya_data')) || DEFAULT
 
 window.loadDataFromFirebase = async function () {
     if (window.firebaseInitPromise) await window.firebaseInitPromise;
+    let dataToUse = null;
+
     if (window.db) {
         try {
             const snapshot = await window.db.ref('siteData').once('value');
             if (snapshot.exists()) {
-                const data = snapshot.val();
-                window.SITE_DATA = data;
-                localStorage.setItem('abhyudaya_data', JSON.stringify(data));
-                return data;
+                dataToUse = snapshot.val();
+                localStorage.setItem('abhyudaya_data', JSON.stringify(dataToUse));
             }
         } catch (e) {
             console.warn("Failed to read from Firebase. Using local storage.", e);
         }
     }
-    return JSON.parse(localStorage.getItem('abhyudaya_data')) || DEFAULT_SITE_DATA;
+
+    if (!dataToUse) {
+        dataToUse = JSON.parse(localStorage.getItem('abhyudaya_data'));
+    }
+
+    // Merge missing keys (especially newly created features like `announcement`) from DEFAULT_SITE_DATA
+    if (dataToUse) {
+        if (!dataToUse.announcement) dataToUse.announcement = DEFAULT_SITE_DATA.announcement;
+        if (!dataToUse.hero) dataToUse.hero = DEFAULT_SITE_DATA.hero;
+        if (!dataToUse.uspBanner) dataToUse.uspBanner = DEFAULT_SITE_DATA.uspBanner;
+        window.SITE_DATA = dataToUse;
+        return dataToUse;
+    }
+
+    window.SITE_DATA = DEFAULT_SITE_DATA;
+    return DEFAULT_SITE_DATA;
 };
 
 async function saveSiteData(data) {

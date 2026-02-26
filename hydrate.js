@@ -18,8 +18,8 @@ function extractYouTubeId(input) {
             if (u.hostname.includes('youtu.be')) return u.pathname.slice(1);
             if (u.pathname.startsWith('/embed/')) return u.pathname.split('/embed/')[1];
         }
-    } catch (_) {}
-    
+    } catch (_) { }
+
     // Fallback regex if URL parse fails or it's a raw string
     const match = input.match(/^.*(youtu\.be\/|v\/|u\/\w\/|embed\/|shorts\/|watch\?v=|\&v=)([^#\&\?]*).*/);
     return (match && match[2] && match[2].length >= 10) ? match[2] : input.trim();
@@ -81,17 +81,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     const data = window.SITE_DATA;
     if (!data) return;
 
-    try { hydrateAnnouncement(data); } catch(e) { console.warn('Announcement error:', e); }
-    try { hydrateHero(data); } catch(e) { console.warn('Hero error:', e); }
-    try { hydrateUSP(data); } catch(e) { console.warn('USP error:', e); }
-    try { hydrateStats(data); } catch(e) { console.warn('Stats error:', e); }
-    try { hydrateAbout(data); } catch(e) { console.warn('About error:', e); }
-    try { hydratePrograms(data); } catch(e) { console.warn('Programs error:', e); }
-    try { hydrateTestimonials(data); } catch(e) { console.warn('Testimonials error:', e); }
-    try { hydrateStudentLife(data); } catch(e) { console.warn('StudentLife error:', e); }
-    try { hydrateVideos(data); } catch(e) { console.warn('Videos error:', e); }
-    try { hydrateGallery(data); } catch(e) { console.warn('Gallery error:', e); }
-    try { hydrateContact(data); } catch(e) { console.warn('Contact error:', e); }
+    try { hydrateAnnouncement(data); } catch (e) { console.warn('Announcement error:', e); }
+    try { hydrateHero(data); } catch (e) { console.warn('Hero error:', e); }
+    try { hydrateUSP(data); } catch (e) { console.warn('USP error:', e); }
+    try { hydrateStats(data); } catch (e) { console.warn('Stats error:', e); }
+    try { hydrateAbout(data); } catch (e) { console.warn('About error:', e); }
+    try { hydratePrograms(data); } catch (e) { console.warn('Programs error:', e); }
+    try { hydrateTestimonials(data); } catch (e) { console.warn('Testimonials error:', e); }
+    try { hydrateStudentLife(data); } catch (e) { console.warn('StudentLife error:', e); }
+    try { hydrateVideos(data); } catch (e) { console.warn('Videos error:', e); }
+    try { hydrateGallery(data); } catch (e) { console.warn('Gallery error:', e); }
+    try { hydrateContact(data); } catch (e) { console.warn('Contact error:', e); }
 
     // Re-initialize GSAP animations to account for freshly added items
     if (typeof window.refreshGSAP === 'function') {
@@ -104,23 +104,28 @@ document.addEventListener('DOMContentLoaded', async () => {
    ═══════════════════════════════════════════════════════════════════ */
 
 function hydrateAnnouncement(data) {
-    if (!data.announcement?.enabled) return;
+    const ann = data.announcement || {};
+    // Treat 'true' string as boolean true
+    const isEnabled = ann.enabled === true || ann.enabled === 'true';
+    if (!isEnabled) return;
+
     const bar = document.getElementById('announcementBar');
     const textObj = document.getElementById('announcementText');
     const linkObj = document.getElementById('announcementLink');
-    if (!bar || !textObj || !linkObj || !data.announcement.text) return;
-    
-    bar.className = `theme-${data.announcement.theme || 'classic'}`;
-    textObj.innerText = data.announcement.text;
-    
-    if (data.announcement.link && data.announcement.linkText) {
-        linkObj.href = data.announcement.link;
-        linkObj.querySelector('span').innerText = data.announcement.linkText;
+    if (!bar || !textObj || !linkObj || !ann.text) return;
+
+    bar.className = `theme-${ann.theme || 'classic'}`;
+    textObj.innerText = ann.text;
+
+    if (ann.link && ann.linkText) {
+        linkObj.href = ann.link;
+        const linkSpan = linkObj.querySelector('span');
+        if (linkSpan) linkSpan.innerText = ann.linkText;
         linkObj.style.display = 'inline-flex';
     } else {
         linkObj.style.display = 'none';
     }
-    
+
     bar.style.display = 'flex';
 }
 
@@ -214,7 +219,7 @@ function hydratePrograms(data) {
 
         const card = document.createElement('div');
         card.className = 'card reveal';
-        
+
         const fList = (c.features || []).map(f => `<li>${f}</li>`).join('');
 
         card.innerHTML = `
@@ -361,7 +366,7 @@ function hydrateVideos(data) {
 
     if (videos.length > pages.length) {
         const extraVideos = videos.slice(pages.length);
-        
+
         extraGrid = document.createElement('div');
         extraGrid.id = 'extraVideosGrid';
         extraGrid.style.display = 'grid';
@@ -382,7 +387,7 @@ function hydrateVideos(data) {
             card.style.transition = 'transform 0.3s, border-color 0.3s';
             card.onmouseenter = () => { card.style.transform = 'translateY(-5px)'; card.style.borderColor = 'var(--primary)'; };
             card.onmouseleave = () => { card.style.transform = ''; card.style.borderColor = 'rgba(255,255,255,0.1)'; };
-            
+
             card.innerHTML = `
                 <img src="${thumb}" style="width:100%; height:100%; object-fit:cover;" loading="lazy">
                 <div style="position:absolute; inset:0; background:linear-gradient(to top, rgba(0,0,0,0.9), transparent); display:flex; flex-direction:column; justify-content:flex-end; padding:1.5rem;">
