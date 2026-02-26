@@ -388,8 +388,11 @@
             <div class="nav-item" data-target="gallery"><i class="ri-image-line"></i> Gallery (Photos)</div>
             <div class="nav-item" data-target="contact"><i class="ri-contacts-line"></i> Contact Info</div>
             <div class="nav-item" data-target="contactSubmissions"
-                style="background: rgba(239, 68, 68, 0.1); color: #ef4444; margin-top: 1rem;"><i
-                    class="ri-inbox-archive-line"></i> Form Submissions</div>
+                style="background: rgba(239, 68, 68, 0.1); color: #ef4444; margin-top: 1rem; position: relative;">
+                <i class="ri-inbox-archive-line"></i> Form Submissions
+                <span id="submissionsBadge"
+                    style="display:none; position:absolute; right: 1rem; background:#ef4444; color:white; font-size:0.75rem; font-weight:bold; padding: 0.1rem 0.5rem; border-radius:1rem;"></span>
+            </div>
             <a href="../index.html" class="nav-item" target="_blank" style="margin-top:auto; text-decoration:none;"><i
                     class="ri-external-link-line"></i> View Website</a>
         </div>
@@ -826,6 +829,49 @@
             exportData();
         }
 
+        async function checkSubmissionsAlert() {
+            if (window.firebaseInitPromise) await window.firebaseInitPromise;
+            if (window.db) {
+                try {
+                    const snapshot = await window.db.ref('contact_submissions').once('value');
+                    const count = snapshot.numChildren();
+
+                    if (count > 0) {
+                        const badge = document.getElementById('submissionsBadge');
+                        if (badge) {
+                            badge.innerText = count > 99 ? '99+' : count;
+                            badge.style.display = 'inline-block';
+                        }
+
+                        // Fire a small toast notification so the admin knows immediately
+                        const toast = document.createElement('div');
+                        toast.innerHTML = `<i class="ri-mail-unread-line" style="font-size:1.5rem;"></i> You have <b>${count}</b> new form submissions!`;
+                        Object.assign(toast.style, {
+                            position: 'fixed', bottom: '2rem', right: '2rem',
+                            background: '#ef4444', color: 'white', padding: '1rem 1.5rem',
+                            borderRadius: '0.5rem', boxShadow: '0 10px 25px rgba(239, 68, 68, 0.4)',
+                            zIndex: '9999', display: 'flex', alignItems: 'center', gap: '0.75rem',
+                            transform: 'translateY(100px)', opacity: '0', transition: 'all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55)'
+                        });
+                        document.body.appendChild(toast);
+
+                        setTimeout(() => {
+                            toast.style.transform = 'translateY(0)';
+                            toast.style.opacity = '1';
+                        }, 500);
+
+                        setTimeout(() => {
+                            toast.style.transform = 'translateY(100px)';
+                            toast.style.opacity = '0';
+                            setTimeout(() => toast.remove(), 500);
+                        }, 5000);
+                    }
+                } catch (e) {
+                    console.warn("Could not fetch submission count:", e);
+                }
+            }
+        }
+
         function exportData() {
             const jsContent = `const DEFAULT_SITE_DATA = ${JSON.stringify(STATE, null, 4)
                 }; \n\nwindow.SITE_DATA = JSON.parse(localStorage.getItem('abhyudaya_data')) || DEFAULT_SITE_DATA; \n`;
@@ -848,6 +894,9 @@
             // Update the global STATE object that all the form inputs bind to
             Object.assign(STATE, window.SITE_DATA);
             loadSection('hero', 'Hero Section');
+
+            // Trigger contact forms check alert
+            checkSubmissionsAlert();
         }
 
         initAdmin();
