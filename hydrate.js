@@ -8,15 +8,11 @@
 const INITIAL_SHOW = { gallery: 6, testimonials: 6, studentLife: 6 };
 
 /* ── Extract YouTube video ID from any URL or raw ID ────────────── */
-function extractYouTubeId(input) {
-    if (!input) return '';
-    try {
-        if (input.includes('youtube.com') || input.includes('youtu.be')) {
-            const url = new URL(input);
-            return url.searchParams.get('v') || url.pathname.replace('/', '').split('?')[0];
-        }
-    } catch (_) {}
-    return input.trim();
+function extractYouTubeId(url) {
+    if (!url) return '';
+    const regExp = /^.*(youtu\.be\/|v\/|u\/\w\/|embed\/|shorts\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    const match = url.match(regExp);
+    return (match && match[2].length === 11) ? match[2] : url.trim();
 }
 
 /* ── Get YouTube thumbnail URL ────────────────────────────────────── */
