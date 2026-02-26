@@ -1214,6 +1214,35 @@
             cursor: not-allowed;
         }
 
+        @media (max-width: 768px) {
+            .flipbook {
+                height: 480px;
+                perspective: none;
+            }
+
+            .flipbook-page {
+                width: 100%;
+                left: 0;
+                transform-origin: center center;
+                transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.5s;
+            }
+
+            .flipbook-page-front,
+            .flipbook-page-back {
+                border-radius: 1.5rem;
+            }
+
+            .flipbook-page-back {
+                display: none;
+            }
+
+            .flipbook-page.flipped {
+                transform: translateX(-40px) scale(0.9) !important;
+                opacity: 0;
+                pointer-events: none;
+            }
+        }
+
         /* GALLERY */
         .gallery-grid {
             display: grid;
@@ -1551,11 +1580,22 @@
             color: var(--primary);
         }
 
-        .footer-section p,
+        .footer-section p {
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 2;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        /* Ensure the first section containing <br> defaults back to block so line breaks work */
+        .footer-section:first-child p {
+            display: block;
+        }
+
         .footer-section a {
             color: rgba(255, 255, 255, 0.7);
             text-decoration: none;
-            line-height: 2;
             transition: all 0.3s;
             display: flex;
             align-items: center;
