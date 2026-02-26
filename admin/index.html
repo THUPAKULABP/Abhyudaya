@@ -755,6 +755,12 @@
 
                 const snapshot = await window.db.ref('contact_submissions').once('value');
 
+                // Clear the unread badge once visited
+                const numTotal = snapshot.numChildren();
+                localStorage.setItem('abhyudaya_last_seen_submissions', numTotal);
+                const badge = document.getElementById('submissionsBadge');
+                if (badge) badge.style.display = 'none';
+
                 if (!snapshot.exists()) {
                     container.innerHTML = "<p style='text-align:center; color:rgba(255,255,255,0.7);'>No form submissions found.</p>";
                     return;
@@ -835,17 +841,19 @@
                 try {
                     const snapshot = await window.db.ref('contact_submissions').once('value');
                     const count = snapshot.numChildren();
+                    const lastSeenCount = parseInt(localStorage.getItem('abhyudaya_last_seen_submissions') || '0', 10);
+                    const unreadCount = count - lastSeenCount;
 
-                    if (count > 0) {
+                    if (unreadCount > 0) {
                         const badge = document.getElementById('submissionsBadge');
                         if (badge) {
-                            badge.innerText = count > 99 ? '99+' : count;
+                            badge.innerText = unreadCount > 99 ? '99+' : unreadCount;
                             badge.style.display = 'inline-block';
                         }
 
                         // Fire a small toast notification so the admin knows immediately
                         const toast = document.createElement('div');
-                        toast.innerHTML = `<i class="ri-mail-unread-line" style="font-size:1.5rem;"></i> You have <b>${count}</b> new form submissions!`;
+                        toast.innerHTML = `<i class="ri-mail-unread-line" style="font-size:1.5rem;"></i> You have <b>${unreadCount}</b> new form submissions!`;
                         Object.assign(toast.style, {
                             position: 'fixed', bottom: '2rem', right: '2rem',
                             background: '#ef4444', color: 'white', padding: '1rem 1.5rem',
