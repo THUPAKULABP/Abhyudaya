@@ -1,184 +1,205 @@
 /* =====================================================================
    hydrate.js — Abhyudaya Website Dynamic Content Renderer
-   Rebuilds ALL sections from SITE_DATA so new content added via Admin
-   is always visible. Supports "Load More", YouTube auto-thumbnails,
-   search, and sort order.
+   Fully rebuilds Gallery, Testimonials, Student Life from SITE_DATA.
+   Videos section: updates existing flipbook pages AND adds extras.
+   Supports "Load More", auto-YouTube thumbnails.
    ===================================================================== */
 
-const INITIAL_SHOW = { gallery: 6, testimonials: 6, studentLife: 6, videos: 4 };
+const INITIAL_SHOW = { gallery: 6, testimonials: 6, studentLife: 6 };
 
-/* ── Helper: extract YouTube video ID from any URL or raw ID ─────── */
+/* ── Extract YouTube video ID from any URL or raw ID ────────────── */
 function extractYouTubeId(input) {
     if (!input) return '';
     try {
         if (input.includes('youtube.com') || input.includes('youtu.be')) {
             const url = new URL(input);
-            return url.searchParams.get('v') || url.pathname.replace('/', '');
+            return url.searchParams.get('v') || url.pathname.replace('/', '').split('?')[0];
         }
     } catch (_) {}
     return input.trim();
 }
 
-/* ── Helper: get YouTube thumbnail URL from videoId ─────────────── */
+/* ── Get YouTube thumbnail URL ────────────────────────────────────── */
 function ytThumb(videoId) {
     const id = extractYouTubeId(videoId);
-    return `https://img.youtube.com/vi/${id}/hqdefault.jpg`;
+    return id ? `https://img.youtube.com/vi/${id}/hqdefault.jpg` : '';
 }
 
-/* ── Helper: create "Load More" button ───────────────────────────── */
+/* ── Resolve best thumbnail URL ──────────────────────────────────── */
+function resolveThumbnail(v) {
+    if (v.thumbnail && v.thumbnail.trim() !== '' && !v.thumbnail.includes('unsplash.com')) {
+        return v.thumbnail;
+    }
+    return ytThumb(v.videoId) || v.thumbnail || '';
+}
+
+/* ── Create "Load More" button ───────────────────────────────────── */
 function createLoadMoreBtn(label, onClick) {
     const wrapper = document.createElement('div');
+    wrapper.className = 'load-more-wrapper';
     wrapper.style.cssText = 'text-align:center; margin-top: 3rem;';
-    wrapper.innerHTML = `
-        <button class="load-more-btn" style="
-            display: inline-flex; align-items: center; gap: 0.75rem;
-            padding: 1rem 2.5rem;
-            background: rgba(255,107,0,0.1);
-            border: 2px solid rgba(255,107,0,0.4);
-            color: #ff6b00; border-radius: 100px;
-            font-family: 'Inter', sans-serif; font-size: 1rem; font-weight: 700;
-            cursor: pointer; transition: all 0.4s; letter-spacing: 0.02em;
-        " onmouseenter="this.style.background='rgba(255,107,0,0.2)';this.style.borderColor='#ff6b00';this.style.transform='translateY(-3px)'"
-           onmouseleave="this.style.background='rgba(255,107,0,0.1)';this.style.borderColor='rgba(255,107,0,0.4)';this.style.transform=''"
-        >
-            <i class="ri-add-circle-line"></i> ${label}
-        </button>`;
-    wrapper.querySelector('button').addEventListener('click', onClick);
+    const btn = document.createElement('button');
+    btn.innerHTML = `<i class="ri-add-circle-line"></i> ${label}`;
+    btn.style.cssText = `
+        display: inline-flex; align-items: center; gap: 0.75rem;
+        padding: 1rem 2.5rem;
+        background: rgba(255,107,0,0.1);
+        border: 2px solid rgba(255,107,0,0.4);
+        color: #ff6b00; border-radius: 100px;
+        font-family: 'Inter', sans-serif; font-size: 1rem; font-weight: 700;
+        cursor: pointer; transition: all 0.4s;`;
+    btn.onmouseenter = () => { btn.style.background = 'rgba(255,107,0,0.2)'; btn.style.borderColor = '#ff6b00'; btn.style.transform = 'translateY(-3px)'; };
+    btn.onmouseleave = () => { btn.style.background = 'rgba(255,107,0,0.1)'; btn.style.borderColor = 'rgba(255,107,0,0.4)'; btn.style.transform = ''; };
+    btn.addEventListener('click', onClick);
+    wrapper.appendChild(btn);
     return wrapper;
 }
 
+/* ── FadeIn animation for new items ──────────────────────────────── */
+const _style = document.createElement('style');
+_style.textContent = `@keyframes fadeInUp { from { opacity:0; transform:translateY(30px); } to { opacity:1; transform:translateY(0); } }`;
+document.head.appendChild(_style);
+
+/* =====================================================================
+   MAIN ENTRY POINT
+   ===================================================================== */
 document.addEventListener('DOMContentLoaded', async () => {
-    if (window.loadDataFromFirebase) {
-        window.SITE_DATA = await window.loadDataFromFirebase();
+    try {
+        if (window.loadDataFromFirebase) {
+            window.SITE_DATA = await window.loadDataFromFirebase();
+        }
+    } catch (e) {
+        console.warn('Firebase load failed, using local data:', e);
     }
+
     const data = window.SITE_DATA;
+    if (!data) return;
 
-    // ── ANNOUNCEMENT ────────────────────────────────────────────────
-    if (data.announcement && data.announcement.enabled) {
-        const bar = document.getElementById('announcementBar');
-        const textObj = document.getElementById('announcementText');
-        const linkObj = document.getElementById('announcementLink');
-        if (bar && textObj && linkObj && data.announcement.text) {
-            textObj.innerText = data.announcement.text;
-            if (data.announcement.link && data.announcement.linkText) {
-                linkObj.href = data.announcement.link;
-                linkObj.innerText = data.announcement.linkText;
-            } else {
-                linkObj.style.display = 'none';
-            }
-            bar.style.display = 'block';
-            if (window.gsap) gsap.from(bar, { y: -50, opacity: 0, duration: 1, ease: 'power3.out', delay: 2 });
-        }
-    }
-
-    // ── HERO ────────────────────────────────────────────────────────
-    const heroTitle1 = document.querySelector('.hero-title .line:nth-child(1) span');
-    if (heroTitle1) heroTitle1.innerText = data.hero.titleLine1;
-    const heroTitle2 = document.querySelector('.hero-title .line:nth-child(2) span.gradient-text');
-    if (heroTitle2) heroTitle2.innerText = data.hero.titleLine2;
-    const heroBadge = document.querySelector('.hero-badge span');
-    if (heroBadge) heroBadge.innerText = data.hero.badgeText;
-    const heroSubtitle = document.querySelector('.hero-subtitle');
-    if (heroSubtitle) heroSubtitle.innerText = data.hero.subtitle;
-    const heroLoc = document.querySelector('.hero-location span');
-    if (heroLoc) heroLoc.innerText = data.hero.location;
-
-    // ── USP BANNER ──────────────────────────────────────────────────
-    const uspTitle = document.querySelector('.usp-title');
-    if (uspTitle) {
-        uspTitle.innerHTML = `<span class="usp-highlight">${data.uspBanner.titleLine1.split('•')[0].trim()}</span> • ${data.uspBanner.titleLine1.split('•')[1] || ''}<br>${data.uspBanner.titleLine2}`;
-    }
-    const uspDesc = document.querySelector('.usp-content p');
-    if (uspDesc) uspDesc.innerText = data.uspBanner.description;
-
-    // ── STATS ───────────────────────────────────────────────────────
-    const statCards = document.querySelectorAll('.stats-grid .stat-card');
-    statCards.forEach((card, i) => {
-        if (data.stats[i]) {
-            card.querySelector('.stat-number').setAttribute('data-target', data.stats[i].count);
-            card.querySelector('.stat-number').innerText = '0';
-            card.querySelector('.stat-label').innerText = data.stats[i].label;
-        }
-    });
-
-    // ── ABOUT ───────────────────────────────────────────────────────
-    const aboutSection = document.getElementById('about');
-    if (aboutSection) {
-        aboutSection.querySelector('.section-tag').innerText = data.about.tag;
-        aboutSection.querySelector('.section-title').innerText = data.about.title;
-        aboutSection.querySelector('.section-subtitle').innerText = data.about.subtitle;
-        const aboutCards = aboutSection.querySelectorAll('.cards-grid .card');
-        aboutCards.forEach((card, i) => {
-            if (data.about.cards[i]) {
-                card.querySelector('.card-icon i').className = data.about.cards[i].icon;
-                card.querySelector('h3').innerText = data.about.cards[i].title;
-                card.querySelector('p').innerText = data.about.cards[i].description;
-            }
-        });
-    }
-
-    // ── PROGRAMS ────────────────────────────────────────────────────
-    const progSection = document.getElementById('programs');
-    if (progSection) {
-        progSection.querySelector('.section-tag').innerText = data.programs.tag;
-        progSection.querySelector('.section-title').innerText = data.programs.title;
-        progSection.querySelector('.section-subtitle').innerText = data.programs.subtitle;
-        const progCards = progSection.querySelectorAll('.cards-grid .card');
-        progCards.forEach((card, i) => {
-            if (data.programs.cards[i]) {
-                card.querySelector('.card-icon i').className = data.programs.cards[i].icon;
-                card.querySelector('h3').innerText = data.programs.cards[i].title;
-                card.querySelector('p').innerText = data.programs.cards[i].description;
-                const featuresList = card.querySelector('.card-features');
-                if (featuresList && data.programs.cards[i].features) {
-                    featuresList.innerHTML = '';
-                    data.programs.cards[i].features.forEach(feat => {
-                        const li = document.createElement('li');
-                        li.innerText = feat;
-                        featuresList.appendChild(li);
-                    });
-                }
-            }
-        });
-    }
-
-    // ── TESTIMONIALS — Full rebuild with Load More ───────────────────
-    renderTestimonials(data.testimonials);
-
-    // ── STUDENT LIFE — Full rebuild with Load More ───────────────────
-    renderStudentLife(data.studentLife);
-
-    // ── VIDEOS (Flipbook) — Full rebuild ────────────────────────────
-    renderVideos(data.videos);
-
-    // ── GALLERY — Full rebuild with Load More ───────────────────────
-    renderGallery(data.gallery);
-
-    // ── CONTACT ─────────────────────────────────────────────────────
-    const contactInfo = document.querySelector('.contact-info');
-    if (contactInfo) {
-        contactInfo.querySelector('.contact-info-header p').innerText = data.contact.locationDesc;
-        const methods = contactInfo.querySelectorAll('.contact-method');
-        if (methods[0]) { methods[0].href = `tel:${data.contact.phone}`; methods[0].querySelector('p').innerText = data.contact.phoneDisplay; }
-        if (methods[1]) { methods[1].href = `https://wa.me/${data.contact.whatsapp}?text=Hello!`; }
-        if (methods[2]) { methods[2].href = `mailto:${data.contact.email}`; methods[2].querySelector('p').innerText = data.contact.email; }
-        if (methods[3]) { methods[3].href = data.contact.mapUrl || '#'; methods[3].querySelector('p').innerText = data.contact.address; }
-    }
+    try { hydrateAnnouncement(data); } catch(e) { console.warn('Announcement error:', e); }
+    try { hydrateHero(data); } catch(e) { console.warn('Hero error:', e); }
+    try { hydrateUSP(data); } catch(e) { console.warn('USP error:', e); }
+    try { hydrateStats(data); } catch(e) { console.warn('Stats error:', e); }
+    try { hydrateAbout(data); } catch(e) { console.warn('About error:', e); }
+    try { hydratePrograms(data); } catch(e) { console.warn('Programs error:', e); }
+    try { hydrateTestimonials(data); } catch(e) { console.warn('Testimonials error:', e); }
+    try { hydrateStudentLife(data); } catch(e) { console.warn('StudentLife error:', e); }
+    try { hydrateVideos(data); } catch(e) { console.warn('Videos error:', e); }
+    try { hydrateGallery(data); } catch(e) { console.warn('Gallery error:', e); }
+    try { hydrateContact(data); } catch(e) { console.warn('Contact error:', e); }
 });
 
 /* ═══════════════════════════════════════════════════════════════════
-   SECTION RENDERERS — All fully rebuild DOM from data array
+   SECTION UPDATERS
    ═══════════════════════════════════════════════════════════════════ */
 
-/* ── TESTIMONIALS ────────────────────────────────────────────────── */
-function renderTestimonials(items) {
+function hydrateAnnouncement(data) {
+    if (!data.announcement?.enabled) return;
+    const bar = document.getElementById('announcementBar');
+    const textObj = document.getElementById('announcementText');
+    const linkObj = document.getElementById('announcementLink');
+    if (!bar || !textObj || !linkObj || !data.announcement.text) return;
+    textObj.innerText = data.announcement.text;
+    if (data.announcement.link && data.announcement.linkText) {
+        linkObj.href = data.announcement.link;
+        linkObj.innerText = data.announcement.linkText;
+    } else {
+        linkObj.style.display = 'none';
+    }
+    bar.style.display = 'block';
+    if (window.gsap) gsap.from(bar, { y: -50, opacity: 0, duration: 1, ease: 'power3.out', delay: 2 });
+}
+
+function hydrateHero(data) {
+    const t1 = document.querySelector('.hero-title .line:nth-child(1) span');
+    if (t1) t1.innerText = data.hero.titleLine1;
+    const t2 = document.querySelector('.hero-title .line:nth-child(2) span.gradient-text');
+    if (t2) t2.innerText = data.hero.titleLine2;
+    const badge = document.querySelector('.hero-badge span');
+    if (badge) badge.innerText = data.hero.badgeText;
+    const sub = document.querySelector('.hero-subtitle');
+    if (sub) sub.innerText = data.hero.subtitle;
+    const loc = document.querySelector('.hero-location span');
+    if (loc) loc.innerText = data.hero.location;
+}
+
+function hydrateUSP(data) {
+    const title = document.querySelector('.usp-title');
+    if (title) {
+        const parts = data.uspBanner.titleLine1.split('•');
+        title.innerHTML = `<span class="usp-highlight">${(parts[0] || '').trim()}</span> • ${parts[1] || ''}<br>${data.uspBanner.titleLine2}`;
+    }
+    const desc = document.querySelector('.usp-content p');
+    if (desc) desc.innerText = data.uspBanner.description;
+}
+
+function hydrateStats(data) {
+    document.querySelectorAll('.stats-grid .stat-card').forEach((card, i) => {
+        if (!data.stats[i]) return;
+        const num = card.querySelector('.stat-number');
+        if (num) { num.setAttribute('data-target', data.stats[i].count); num.innerText = '0'; }
+        const lbl = card.querySelector('.stat-label');
+        if (lbl) lbl.innerText = data.stats[i].label;
+    });
+}
+
+function hydrateAbout(data) {
+    const section = document.getElementById('about');
+    if (!section) return;
+    const tag = section.querySelector('.section-tag');
+    if (tag) tag.innerText = data.about.tag;
+    const title = section.querySelector('.section-title');
+    if (title) title.innerText = data.about.title;
+    const sub = section.querySelector('.section-subtitle');
+    if (sub) sub.innerText = data.about.subtitle;
+    section.querySelectorAll('.cards-grid .card').forEach((card, i) => {
+        if (!data.about.cards[i]) return;
+        const icon = card.querySelector('.card-icon i');
+        if (icon) icon.className = data.about.cards[i].icon;
+        const h = card.querySelector('h3');
+        if (h) h.innerText = data.about.cards[i].title;
+        const p = card.querySelector('p');
+        if (p) p.innerText = data.about.cards[i].description;
+    });
+}
+
+function hydratePrograms(data) {
+    const section = document.getElementById('programs');
+    if (!section) return;
+    const tag = section.querySelector('.section-tag');
+    if (tag) tag.innerText = data.programs.tag;
+    const title = section.querySelector('.section-title');
+    if (title) title.innerText = data.programs.title;
+    const sub = section.querySelector('.section-subtitle');
+    if (sub) sub.innerText = data.programs.subtitle;
+    section.querySelectorAll('.cards-grid .card').forEach((card, i) => {
+        if (!data.programs.cards[i]) return;
+        const icon = card.querySelector('.card-icon i');
+        if (icon) icon.className = data.programs.cards[i].icon;
+        const h = card.querySelector('h3');
+        if (h) h.innerText = data.programs.cards[i].title;
+        const p = card.querySelector('p');
+        if (p) p.innerText = data.programs.cards[i].description;
+        const features = card.querySelector('.card-features');
+        if (features && data.programs.cards[i].features) {
+            features.innerHTML = '';
+            data.programs.cards[i].features.forEach(f => {
+                const li = document.createElement('li'); li.innerText = f; features.appendChild(li);
+            });
+        }
+    });
+}
+
+/* ── TESTIMONIALS — Full rebuild ─────────────────────────────────── */
+function hydrateTestimonials(data) {
     const grid = document.querySelector('.testimonials-grid');
     if (!grid) return;
+    const items = data.testimonials || [];
     const show = INITIAL_SHOW.testimonials;
     grid.innerHTML = '';
-
     items.slice(0, show).forEach(t => grid.appendChild(buildTestimonialCard(t)));
-
+    // Remove any old load-more
+    const old = grid.parentElement.querySelector('.load-more-wrapper');
+    if (old) old.remove();
     if (items.length > show) {
         let shown = show;
         const btn = createLoadMoreBtn(`Load More Reviews (${items.length - show} more)`, () => {
@@ -212,15 +233,16 @@ function buildTestimonialCard(t) {
     return card;
 }
 
-/* ── STUDENT LIFE ────────────────────────────────────────────────── */
-function renderStudentLife(items) {
+/* ── STUDENT LIFE — Full rebuild ─────────────────────────────────── */
+function hydrateStudentLife(data) {
     const grid = document.querySelector('.life-grid');
     if (!grid) return;
+    const items = data.studentLife || [];
     const show = INITIAL_SHOW.studentLife;
     grid.innerHTML = '';
-
     items.slice(0, show).forEach(s => grid.appendChild(buildLifeCard(s)));
-
+    const old = grid.parentElement.querySelector('.load-more-wrapper');
+    if (old) old.remove();
     if (items.length > show) {
         let shown = show;
         const btn = createLoadMoreBtn(`Load More Activities (${items.length - show} more)`, () => {
@@ -240,7 +262,8 @@ function buildLifeCard(s) {
     const card = document.createElement('div');
     card.className = 'life-card';
     card.innerHTML = `
-        <img src="${s.image || ''}" alt="${s.title || ''}" loading="lazy" style="width:100%;height:100%;object-fit:cover;transition:transform 0.6s;">
+        <img src="${s.image || ''}" alt="${s.title || ''}" loading="lazy"
+            style="width:100%;height:100%;object-fit:cover;transition:transform 0.6s;position:absolute;top:0;left:0;">
         <div class="life-icon"><i class="${s.icon || 'ri-image-line'}"></i></div>
         <div class="life-card-overlay">
             <h3>${s.title || ''}</h3>
@@ -249,15 +272,70 @@ function buildLifeCard(s) {
     return card;
 }
 
-/* ── GALLERY ─────────────────────────────────────────────────────── */
-function renderGallery(items) {
+/* ── VIDEOS — Update existing flipbook pages + handle extras ─────── */
+function hydrateVideos(data) {
+    const flipbook = document.querySelector('.flipbook');
+    if (!flipbook) return;
+    const videos = data.videos || [];
+    const pages = flipbook.querySelectorAll('.flipbook-page');
+
+    // Update existing pages
+    pages.forEach((page, i) => {
+        if (!videos[i]) return;
+        const v = videos[i];
+        const thumb = resolveThumbnail(v);
+
+        // Front: update image + text
+        const imgEl = page.querySelector('.flipbook-page-front img');
+        if (imgEl) imgEl.src = thumb;
+        const h3 = page.querySelector('.page-info h3');
+        if (h3) h3.innerText = v.title || '';
+        const p = page.querySelector('.page-info p');
+        if (p) p.innerText = v.subtitle || '';
+
+        // Play button — set up click handler
+        const playBtn = page.querySelector('.play-button');
+        if (playBtn) {
+            const newBtn = playBtn.cloneNode(true); // remove old listeners
+            playBtn.parentNode.replaceChild(newBtn, playBtn);
+            newBtn.addEventListener('click', e => {
+                e.stopPropagation();
+                openYoutubeModal(v.videoId);
+            });
+        }
+
+        // Back: update text
+        const backIcon = page.querySelector('.flipbook-page-back i');
+        if (backIcon && v.backIcon) { backIcon.className = v.backIcon; backIcon.style.color = v.backIconColor || 'var(--primary)'; }
+        const backH3 = page.querySelector('.flipbook-page-back h3');
+        if (backH3) backH3.innerText = v.backTitle || v.title || '';
+        const backP = page.querySelector('.flipbook-page-back p');
+        if (backP) backP.innerText = v.backDesc || '';
+    });
+
+    // If there are MORE videos than HTML pages, show a "View More Videos" note
+    if (videos.length > pages.length) {
+        const container = flipbook.closest('.flipbook-container') || flipbook.parentElement;
+        const old = container.querySelector('.load-more-wrapper');
+        if (old) old.remove();
+        const extra = videos.length - pages.length;
+        const btn = createLoadMoreBtn(`${extra} More Video${extra > 1 ? 's' : ''} Available — Tap to Scroll`, () => {
+            document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
+        });
+        container.appendChild(btn);
+    }
+}
+
+/* ── GALLERY — Full rebuild ──────────────────────────────────────── */
+function hydrateGallery(data) {
     const grid = document.querySelector('.gallery-grid');
     if (!grid) return;
+    const items = data.gallery || [];
     const show = INITIAL_SHOW.gallery;
     grid.innerHTML = '';
-
     items.slice(0, show).forEach(g => grid.appendChild(buildGalleryItem(g)));
-
+    const old = grid.parentElement.querySelector('.load-more-wrapper');
+    if (old) old.remove();
     if (items.length > show) {
         let shown = show;
         const btn = createLoadMoreBtn(`View More Photos (${items.length - show} more)`, () => {
@@ -285,89 +363,17 @@ function buildGalleryItem(g) {
     return item;
 }
 
-/* ── VIDEOS (Flipbook) — rebuilds flipbook pages from data ──────── */
-function renderVideos(videos) {
-    const flipbook = document.querySelector('.flipbook');
-    if (!flipbook) return;
-
-    // Clear and rebuild
-    flipbook.innerHTML = '';
-
-    const show = Math.min(videos.length, INITIAL_SHOW.videos);
-    const initialVideos = videos.slice(0, show);
-
-    initialVideos.forEach((v, i) => {
-        const thumb = (v.thumbnail && !v.thumbnail.includes('unsplash') && v.thumbnail.trim() !== '')
-            ? v.thumbnail
-            : ytThumb(v.videoId);
-        const page = document.createElement('div');
-        page.className = 'flipbook-page';
-        page.style.zIndex = show - i;
-        page.innerHTML = `
-            <div class="flipbook-page-front">
-                <img src="${thumb}" alt="${v.title || ''}" loading="lazy" style="width:100%;height:100%;object-fit:cover;">
-                <div class="page-overlay"></div>
-                <div class="page-info">
-                    <h3>${v.title || ''}</h3>
-                    <p>${v.subtitle || ''}</p>
-                </div>
-                <button class="play-button" data-video-id="${extractYouTubeId(v.videoId)}">
-                    <i class="ri-play-fill"></i>
-                </button>
-            </div>
-            <div class="flipbook-page-back">
-                <div class="back-content">
-                    <i class="${v.backIcon || 'ri-video-line'}" style="color:${v.backIconColor || 'var(--primary)'}"></i>
-                    <h3>${v.backTitle || v.title || ''}</h3>
-                    <p>${v.backDesc || v.subtitle || ''}</p>
-                </div>
-            </div>`;
-
-        page.querySelector('.play-button').addEventListener('click', (e) => {
-            e.stopPropagation();
-            openYoutubeModal(v.videoId);
-        });
-
-        flipbook.appendChild(page);
-    });
-
-    // Re-init flipbook navigation
-    initFlipbookNav(flipbook, videos, show);
-}
-
-function initFlipbookNav(flipbook, allVideos, initialShown) {
-    const navEl = document.querySelector('.flipbook-nav');
-    if (!navEl) return;
-
-    let currentPage = 0;
-    const pages = () => flipbook.querySelectorAll('.flipbook-page');
-
-    function updateFlipbook() {
-        const all = pages();
-        all.forEach((page, i) => {
-            page.classList.toggle('flipped', i < currentPage);
-            page.style.zIndex = i < currentPage
-                ? (i + 1)
-                : (all.length - i + initialShown);
-        });
-        navEl.querySelector('#prevBtn').disabled = currentPage === 0;
-        navEl.querySelector('#nextBtn').disabled = currentPage >= all.length;
-    }
-
-    navEl.querySelector('#prevBtn').onclick = () => {
-        if (currentPage > 0) { currentPage--; updateFlipbook(); }
-    };
-    navEl.querySelector('#nextBtn').onclick = () => {
-        if (currentPage < pages().length) { currentPage++; updateFlipbook(); }
-    };
-
-    pages().forEach((page, idx) => {
-        page.addEventListener('click', () => {
-            if (idx === currentPage) { currentPage++; updateFlipbook(); }
-        });
-    });
-
-    updateFlipbook();
+/* ── CONTACT ──────────────────────────────────────────────────────── */
+function hydrateContact(data) {
+    const contactInfo = document.querySelector('.contact-info');
+    if (!contactInfo || !data.contact) return;
+    const headerP = contactInfo.querySelector('.contact-info-header p');
+    if (headerP) headerP.innerText = data.contact.locationDesc;
+    const methods = contactInfo.querySelectorAll('.contact-method');
+    if (methods[0]) { methods[0].href = `tel:${data.contact.phone}`; const p = methods[0].querySelector('p'); if (p) p.innerText = data.contact.phoneDisplay; }
+    if (methods[1]) { methods[1].href = `https://wa.me/${data.contact.whatsapp}?text=Hello!`; }
+    if (methods[2]) { methods[2].href = `mailto:${data.contact.email}`; const p = methods[2].querySelector('p'); if (p) p.innerText = data.contact.email; }
+    if (methods[3]) { methods[3].href = data.contact.mapUrl || '#'; const p = methods[3].querySelector('p'); if (p) p.innerText = data.contact.address; }
 }
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -447,8 +453,3 @@ window.submitContactForm = async function () {
         setTimeout(() => { submitText.innerText = originalText; submitIcon.className = originalIcon; submitBtn.style.background = ''; submitBtn.disabled = false; }, 4000);
     }
 };
-
-/* ── FadeInUp animation for Load More items ─────────────────────── */
-const style = document.createElement('style');
-style.textContent = `@keyframes fadeInUp { from { opacity:0; transform:translateY(30px); } to { opacity:1; transform:translateY(0); } }`;
-document.head.appendChild(style);
