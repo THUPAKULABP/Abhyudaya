@@ -3145,8 +3145,18 @@
             (data.videos || []).forEach(v => {
                 if ((v.title || '').toLowerCase().includes(q) || (v.subtitle || '').toLowerCase().includes(q) || (v.backTitle || '').toLowerCase().includes(q)) {
                     let ytId = v.videoId || '';
-                    const match = ytId.match(/^.*(youtu\.be\/|v\/|u\/\w\/|embed\/|shorts\/|watch\?v=|\&v=)([^#\&\?]*).*/);
-                    if (match && match[2].length === 11) ytId = match[2];
+                    try {
+                        let u = new URL(ytId);
+                        if (u.hostname.includes('youtube.com') || u.hostname.includes('youtu.be')) {
+                            if (u.pathname.startsWith('/shorts/')) ytId = u.pathname.split('/shorts/')[1].split('?')[0];
+                            else if (u.searchParams.has('v')) ytId = u.searchParams.get('v');
+                            else if (u.hostname.includes('youtu.be')) ytId = u.pathname.slice(1);
+                            else if (u.pathname.startsWith('/embed/')) ytId = u.pathname.split('/embed/')[1];
+                        }
+                    } catch (_) {
+                        const match = ytId.match(/^.*(youtu\.be\/|v\/|u\/\w\/|embed\/|shorts\/|watch\?v=|\&v=)([^#\&\?]*).*/);
+                        if (match && match[2] && match[2].length >= 10) ytId = match[2];
+                    }
                     
                     const thumb = (v.thumbnail && v.thumbnail.trim()) ? v.thumbnail : `https://img.youtube.com/vi/${ytId}/hqdefault.jpg`;
                     results.push({ type: 'Video', title: v.title, sub: v.subtitle, thumb, href: '#videos' });

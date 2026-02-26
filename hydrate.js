@@ -8,11 +8,21 @@
 const INITIAL_SHOW = { gallery: 6, testimonials: 6, studentLife: 6 };
 
 /* ── Extract YouTube video ID from any URL or raw ID ────────────── */
-function extractYouTubeId(url) {
-    if (!url) return '';
-    const regExp = /^.*(youtu\.be\/|v\/|u\/\w\/|embed\/|shorts\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-    const match = url.match(regExp);
-    return (match && match[2].length === 11) ? match[2] : url.trim();
+function extractYouTubeId(input) {
+    if (!input) return '';
+    try {
+        let u = new URL(input);
+        if (u.hostname.includes('youtube.com') || u.hostname.includes('youtu.be')) {
+            if (u.pathname.startsWith('/shorts/')) return u.pathname.split('/shorts/')[1].split('?')[0];
+            if (u.searchParams.has('v')) return u.searchParams.get('v');
+            if (u.hostname.includes('youtu.be')) return u.pathname.slice(1);
+            if (u.pathname.startsWith('/embed/')) return u.pathname.split('/embed/')[1];
+        }
+    } catch (_) {}
+    
+    // Fallback regex if URL parse fails or it's a raw string
+    const match = input.match(/^.*(youtu\.be\/|v\/|u\/\w\/|embed\/|shorts\/|watch\?v=|\&v=)([^#\&\?]*).*/);
+    return (match && match[2] && match[2].length >= 10) ? match[2] : input.trim();
 }
 
 /* ── Get YouTube thumbnail URL ────────────────────────────────────── */
