@@ -133,12 +133,18 @@ function hydrateUSP(data) {
 }
 
 function hydrateStats(data) {
-    document.querySelectorAll('.stats-grid .stat-card').forEach((card, i) => {
-        if (!data.stats[i]) return;
-        const num = card.querySelector('.stat-number');
-        if (num) { num.setAttribute('data-target', data.stats[i].count); num.innerText = '0'; }
-        const lbl = card.querySelector('.stat-label');
-        if (lbl) lbl.innerText = data.stats[i].label;
+    const grid = document.querySelector('.stats-grid');
+    if (!grid) return;
+    grid.innerHTML = '';
+    const items = data.stats || [];
+    items.forEach(st => {
+        const card = document.createElement('div');
+        card.className = 'stat-card';
+        card.innerHTML = `
+            <div class="stat-number" data-target="${st.count || 0}">0</div>
+            <div class="stat-label">${st.label || ''}</div>
+        `;
+        grid.appendChild(card);
     });
 }
 
@@ -151,14 +157,20 @@ function hydrateAbout(data) {
     if (title) title.innerText = data.about.title;
     const sub = section.querySelector('.section-subtitle');
     if (sub) sub.innerText = data.about.subtitle;
-    section.querySelectorAll('.cards-grid .card').forEach((card, i) => {
-        if (!data.about.cards[i]) return;
-        const icon = card.querySelector('.card-icon i');
-        if (icon) icon.className = data.about.cards[i].icon;
-        const h = card.querySelector('h3');
-        if (h) h.innerText = data.about.cards[i].title;
-        const p = card.querySelector('p');
-        if (p) p.innerText = data.about.cards[i].description;
+
+    const grid = section.querySelector('.cards-grid');
+    if (!grid) return;
+    grid.innerHTML = '';
+    const cards = data.about.cards || [];
+    cards.forEach(c => {
+        const card = document.createElement('div');
+        card.className = 'card reveal';
+        card.innerHTML = `
+            <div class="card-icon"><i class="${c.icon || 'ri-award-line'}"></i></div>
+            <h3>${c.title || ''}</h3>
+            <p>${c.description || ''}</p>
+        `;
+        grid.appendChild(card);
     });
 }
 
@@ -171,21 +183,32 @@ function hydratePrograms(data) {
     if (title) title.innerText = data.programs.title;
     const sub = section.querySelector('.section-subtitle');
     if (sub) sub.innerText = data.programs.subtitle;
-    section.querySelectorAll('.cards-grid .card').forEach((card, i) => {
-        if (!data.programs.cards[i]) return;
-        const icon = card.querySelector('.card-icon i');
-        if (icon) icon.className = data.programs.cards[i].icon;
-        const h = card.querySelector('h3');
-        if (h) h.innerText = data.programs.cards[i].title;
-        const p = card.querySelector('p');
-        if (p) p.innerText = data.programs.cards[i].description;
-        const features = card.querySelector('.card-features');
-        if (features && data.programs.cards[i].features) {
-            features.innerHTML = '';
-            data.programs.cards[i].features.forEach(f => {
-                const li = document.createElement('li'); li.innerText = f; features.appendChild(li);
-            });
-        }
+
+    const grid = section.querySelector('.cards-grid');
+    if (!grid) return;
+    grid.innerHTML = '';
+    const cards = data.programs.cards || [];
+    cards.forEach((c, idx) => {
+        const colors = [
+            'linear-gradient(135deg, #ff6b00, #ff8533)',
+            'linear-gradient(135deg, #d4af37, #f59e0b)',
+            'linear-gradient(135deg, #1e3a8a, #3b82f6)',
+            'linear-gradient(135deg, #10b981, #34d399)'
+        ];
+        const bg = colors[idx % colors.length];
+
+        const card = document.createElement('div');
+        card.className = 'card reveal';
+        
+        const fList = (c.features || []).map(f => `<li>${f}</li>`).join('');
+
+        card.innerHTML = `
+            <div class="card-icon" style="background: ${bg};"><i class="${c.icon || 'ri-graduation-cap-line'}"></i></div>
+            <h3>${c.title || ''}</h3>
+            <p>${c.description || ''}</p>
+            <ul class="card-features">${fList}</ul>
+        `;
+        grid.appendChild(card);
     });
 }
 
@@ -313,14 +336,56 @@ function hydrateVideos(data) {
         if (backP) backP.innerText = v.backDesc || '';
     });
 
-    // If there are MORE videos than HTML pages, show a "View More Videos" note
+    // If there are MORE videos than HTML pages, render them in an extra grid
+    const container = flipbook.closest('.flipbook-container') || flipbook.parentElement;
+    let extraGrid = document.getElementById('extraVideosGrid');
+    if (extraGrid) extraGrid.remove(); // clear old
+
+    const oldBtn = container.querySelector('.load-more-wrapper');
+    if (oldBtn) oldBtn.remove();
+
     if (videos.length > pages.length) {
-        const container = flipbook.closest('.flipbook-container') || flipbook.parentElement;
-        const old = container.querySelector('.load-more-wrapper');
-        if (old) old.remove();
-        const extra = videos.length - pages.length;
-        const btn = createLoadMoreBtn(`${extra} More Video${extra > 1 ? 's' : ''} Available — Tap to Scroll`, () => {
-            document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
+        const extraVideos = videos.slice(pages.length);
+        
+        extraGrid = document.createElement('div');
+        extraGrid.id = 'extraVideosGrid';
+        extraGrid.style.display = 'grid';
+        extraGrid.style.gridTemplateColumns = 'repeat(auto-fit, minmax(280px, 1fr))';
+        extraGrid.style.gap = '2rem';
+        extraGrid.style.marginTop = '4rem';
+        extraGrid.style.display = 'none';
+
+        extraVideos.forEach(v => {
+            const thumb = resolveThumbnail(v);
+            const card = document.createElement('div');
+            card.style.position = 'relative';
+            card.style.borderRadius = '1rem';
+            card.style.overflow = 'hidden';
+            card.style.cursor = 'pointer';
+            card.style.aspectRatio = '16/9';
+            card.style.border = '1px solid rgba(255,255,255,0.1)';
+            card.style.transition = 'transform 0.3s, border-color 0.3s';
+            card.onmouseenter = () => { card.style.transform = 'translateY(-5px)'; card.style.borderColor = 'var(--primary)'; };
+            card.onmouseleave = () => { card.style.transform = ''; card.style.borderColor = 'rgba(255,255,255,0.1)'; };
+            
+            card.innerHTML = `
+                <img src="${thumb}" style="width:100%; height:100%; object-fit:cover;" loading="lazy">
+                <div style="position:absolute; inset:0; background:linear-gradient(to top, rgba(0,0,0,0.9), transparent); display:flex; flex-direction:column; justify-content:flex-end; padding:1.5rem;">
+                    <h3 style="font-family:'Syne', sans-serif; font-size:1.2rem; margin-bottom:0.25rem;">${v.title || ''}</h3>
+                    <p style="color:rgba(255,255,255,0.7); font-size:0.875rem;">${v.subtitle || ''}</p>
+                </div>
+                <div style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); width:50px; height:50px; background:rgba(255,107,0,0.9); border-radius:50%; display:flex; align-items:center; justify-content:center; color:white; font-size:1.5rem;"><i class="ri-play-fill"></i></div>
+            `;
+            card.addEventListener('click', () => openYoutubeModal(v.videoId));
+            extraGrid.appendChild(card);
+        });
+
+        container.appendChild(extraGrid);
+
+        const btn = createLoadMoreBtn(`View ${extraVideos.length} More Video${extraVideos.length > 1 ? 's' : ''}`, () => {
+            extraGrid.style.display = 'grid';
+            extraGrid.style.animation = 'fadeInUp 0.5s ease both';
+            btn.remove();
         });
         container.appendChild(btn);
     }
