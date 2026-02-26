@@ -36,6 +36,9 @@
 
         html {
             scroll-behavior: smooth;
+            overflow-x: hidden;
+            width: 100vw;
+            max-width: 100%;
         }
 
         body {
@@ -43,6 +46,7 @@
             color: var(--light);
             font-family: 'Inter', sans-serif;
             overflow-x: hidden;
+            width: 100%;
             cursor: none;
         }
 
@@ -101,11 +105,12 @@
 
         .loader-text {
             font-family: 'Syne', sans-serif;
-            font-size: clamp(2rem, 6vw, 4rem);
+            font-size: clamp(1.5rem, 5vw, 4rem);
             font-weight: 800;
-            letter-spacing: 0.3em;
+            letter-spacing: clamp(0.1em, 2vw, 0.3em);
             margin-bottom: 2rem;
             overflow: hidden;
+            white-space: nowrap;
         }
 
         .loader-text span {
