@@ -290,6 +290,8 @@
         </div>
         <div class="nav-items" id="navItems">
             <div class="nav-item active" data-target="hero"><i class="ri-layout-top-line"></i> Hero Section</div>
+            <div class="nav-item" data-target="announcement"><i class="ri-notification-3-line"></i> Flash Notice /
+                Announcement</div>
             <div class="nav-item" data-target="uspBanner"><i class="ri-flag-line"></i> USP Banner</div>
             <div class="nav-item" data-target="stats"><i class="ri-bar-chart-box-line"></i> Statistics</div>
             <div class="nav-item" data-target="about"><i class="ri-information-line"></i> About Us</div>
@@ -299,6 +301,9 @@
             <div class="nav-item" data-target="videos"><i class="ri-video-line"></i> Videos (YouTube)</div>
             <div class="nav-item" data-target="gallery"><i class="ri-image-line"></i> Gallery (Photos)</div>
             <div class="nav-item" data-target="contact"><i class="ri-contacts-line"></i> Contact Info</div>
+            <div class="nav-item" data-target="contactSubmissions"
+                style="background: rgba(239, 68, 68, 0.1); color: #ef4444; margin-top: 1rem;"><i
+                    class="ri-inbox-archive-line"></i> Form Submissions</div>
             <a href="../index.html" class="nav-item" target="_blank" style="margin-top:auto; text-decoration:none;"><i
                     class="ri-external-link-line"></i> View Website</a>
         </div>
@@ -338,6 +343,17 @@
             <div class="form-group">
                 <label>${label}</label>
                 <textarea class="form-control" oninput="updateState('${path}', this.value)">${value}</textarea>
+            </div>
+        `;
+        const renderToggle = (label, path, value) => `
+            <div class="form-group" style="display:flex; align-items:center; gap: 1rem; background: rgba(255,107,0,0.05); padding: 1rem; border-radius: 0.5rem; border: 1px dashed var(--primary);">
+                <label style="margin:0; flex:1;">${label}</label>
+                <label style="position: relative; display: inline-block; width: 60px; height: 34px;">
+                    <input type="checkbox" ${value ? 'checked' : ''} onchange="updateState('${path}', this.checked)" style="opacity: 0; width: 0; height: 0;">
+                    <span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: ${value ? 'var(--primary)' : 'rgba(255,255,255,0.2)'}; transition: .4s; border-radius: 34px;">
+                        <span style="position: absolute; content: ''; height: 26px; width: 26px; left: ${value ? '28px' : '4px'}; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%;"></span>
+                    </span>
+                </label>
             </div>
         `;
 
@@ -474,6 +490,16 @@
         }
 
         const sections = {
+            announcement: () => `
+                <div class="card-editor">
+                    <h3>Top Banner Announcement</h3>
+                    <p style="color: rgba(255,255,255,0.6); margin-bottom: 2rem; font-size: 0.9rem;">Turn this on to display a prominent flash notice across the top of the website. Useful for Admissions, Holidays, or Breaking News.</p>
+                    ${renderToggle('Enable Announcement Banner?', 'announcement.enabled', STATE.announcement?.enabled || false)}
+                    ${renderInput('Announcement Text', 'announcement.text', STATE.announcement?.text || "")}
+                    ${renderInput('Button Link (e.g. #contact or https://...)', 'announcement.link', STATE.announcement?.link || "")}
+                    ${renderInput('Button Text (e.g. Apply Now)', 'announcement.linkText', STATE.announcement?.linkText || "")}
+                </div>
+            `,
             hero: () => `
                 < div class="card-editor" >
                     <h3>Hero Content</h3>
@@ -616,15 +642,97 @@
                     ${renderInput('Physical Address', 'contact.address', STATE.contact.address)}
                     ${renderTextarea('Form Description Text', 'contact.locationDesc', STATE.contact.locationDesc)}
                 </div>
+            `,
+            contactSubmissions: () => `
+                <div class="card-editor" id="submissionsContent" style="min-height: 200px;">
+                    <div style="text-align:center; padding: 2rem;">
+                        <i class="ri-loader-4-line ri-spin" style="font-size: 2rem; color: var(--primary);"></i>
+                        <p style="margin-top:1rem; color: var(--secondary);">Securely fetching submissions from Cloudflare...</p>
+                    </div>
+                </div>
             `
         };
 
         const contentArea = document.getElementById('contentArea');
         const pageTitle = document.getElementById('pageTitle');
 
+        async function fetchSubmissions() {
+            const container = document.getElementById('submissionsContent');
+            try {
+                // Fetch using Admin Key
+                const authKey = localStorage.getItem('imagekit_private_key') || prompt("Admin authorization is required. Please enter your Admin Password (IMAGEKIT_PRIVATE_KEY):");
+                if (!authKey) {
+                    container.innerHTML = "<p>Authorization required to view submissions.</p>";
+                    return;
+                }
+
+                // Keep the key in localStorage for convenience since ImageKit uploader uses it too
+                localStorage.setItem('imagekit_private_key', authKey.trim());
+
+                const response = await fetch('/api/contact', {
+                    headers: { 'Authorization': 'Bearer ' + authKey.trim() }
+                });
+
+                if (!response.ok) {
+                    throw new Error("Unauthorized or Error fetching records.");
+                }
+
+                const data = await response.json();
+
+                if (data.length === 0) {
+                    container.innerHTML = "<p style='text-align:center; color:rgba(255,255,255,0.7);'>No form submissions found.</p>";
+                    return;
+                }
+
+                container.innerHTML = data.map(sub => `
+                    <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 0.5rem; padding: 1.5rem; margin-bottom: 1rem; position: relative;">
+                        <button onclick="deleteSubmission('${sub.id}')" style="position:absolute; top: 1rem; right: 1rem; background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 0.25rem; padding: 0.25rem 0.5rem; cursor: pointer;">Delete</button>
+                        <h4 style="color: var(--primary); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                            <i class="ri-user-line"></i> ${sub.firstName} ${sub.lastName}
+                        </h4>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; font-size: 0.9rem; color: rgba(255,255,255,0.8);">
+                            <div><strong><i class="ri-mail-line"></i> Email:</strong> ${sub.email}</div>
+                            <div><strong><i class="ri-phone-line"></i> Phone:</strong> ${sub.phone}</div>
+                            <div><strong><i class="ri-book-open-line"></i> Program:</strong> ${sub.program}</div>
+                            <div><strong><i class="ri-time-line"></i> Date:</strong> ${new Date(sub.timestamp).toLocaleString()}</div>
+                        </div>
+                        <div style="background: rgba(0,0,0,0.2); padding: 1rem; border-radius: 0.25rem; font-style: italic; color: rgba(255,255,255,0.9);">
+                            "${sub.message}"
+                        </div>
+                    </div>
+                `).join('');
+
+            } catch (err) {
+                console.error(err);
+                container.innerHTML = `<p style="color: #ef4444; text-align:center;">${err.message}.<br><br>If you didn't configure your Cloudflare KV Database yet, please refer to the deployment steps provided.</p>`;
+            }
+        }
+
+        window.deleteSubmission = async function (id) {
+            if (!confirm("Are you sure you want to delete this submission?")) return;
+            try {
+                const authKey = localStorage.getItem('imagekit_private_key');
+                const response = await fetch('/api/contact?id=' + encodeURIComponent(id), {
+                    method: 'DELETE',
+                    headers: { 'Authorization': 'Bearer ' + authKey }
+                });
+                if (response.ok) {
+                    fetchSubmissions(); // reload
+                } else {
+                    alert("Failed to delete.");
+                }
+            } catch (err) {
+                alert("Error: " + err.message);
+            }
+        };
+
         function loadSection(id, title) {
             pageTitle.innerText = title;
             contentArea.innerHTML = `<div class="section-panel active">${sections[id]()}</div>`;
+
+            if (id === 'contactSubmissions') {
+                fetchSubmissions();
+            }
         }
 
         // Nav click logic
@@ -645,7 +753,8 @@
         }
 
         function exportData() {
-            const jsContent = `const DEFAULT_SITE_DATA = ${JSON.stringify(STATE, null, 4)}; \n\nwindow.SITE_DATA = JSON.parse(localStorage.getItem('abhyudaya_data')) || DEFAULT_SITE_DATA; \n`;
+            const jsContent = `const DEFAULT_SITE_DATA = ${JSON.stringify(STATE, null, 4)
+                }; \n\nwindow.SITE_DATA = JSON.parse(localStorage.getItem('abhyudaya_data')) || DEFAULT_SITE_DATA; \n`;
 
             const dataStr = "data:text/javascript;charset=utf-8," + encodeURIComponent(jsContent);
             const downloadAnchorNode = document.createElement('a');

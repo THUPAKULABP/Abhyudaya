@@ -1845,6 +1845,12 @@
 </head>
 
 <body>
+    <!-- ANNOUNCEMENT BAR -->
+    <div id="announcementBar" style="display: none; background: linear-gradient(90deg, var(--primary), var(--secondary)); color: white; padding: 12px 20px; text-align: center; position: relative; z-index: 10000; font-family: 'Syne', sans-serif; box-shadow: 0 4px 15px rgba(255,107,0,0.3);">
+        <span id="announcementText" style="margin-right: 15px; font-weight: 600;"></span>
+        <a id="announcementLink" href="#" style="background: white; color: var(--primary); padding: 6px 16px; border-radius: 20px; text-decoration: none; font-weight: bold; font-size: 0.85rem; transition: all 0.3s; display: inline-block;"></a>
+        <button onclick="document.getElementById('announcementBar').style.display='none'" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); background: none; border: none; color: white; cursor: pointer; font-size: 1.5rem;"><i class="ri-close-line"></i></button>
+    </div>
 
     <!-- PREMIUM LOADER -->
     <div class="loader" id="loader">
@@ -2510,42 +2516,42 @@
             </div>
 
             <div class="contact-form-wrapper">
-                <form onsubmit="event.preventDefault(); showSuccessMessage();">
+                <form id="contactForm" onsubmit="event.preventDefault(); window.submitContactForm(event);">
                     <div class="form-grid">
                         <div class="form-group">
                             <label>First Name</label>
-                            <input type="text" required placeholder="John">
+                            <input type="text" id="contactFirstName" required placeholder="John">
                         </div>
                         <div class="form-group">
                             <label>Last Name</label>
-                            <input type="text" required placeholder="Doe">
+                            <input type="text" id="contactLastName" required placeholder="Doe">
                         </div>
                     </div>
                     <div class="form-group">
                         <label>Email Address</label>
-                        <input type="email" required placeholder="your@email.com">
+                        <input type="email" id="contactEmail" required placeholder="your@email.com">
                     </div>
                     <div class="form-group">
                         <label>Phone Number</label>
-                        <input type="tel" required placeholder="+91 98765 43210">
+                        <input type="tel" id="contactPhone" required placeholder="+91 98765 43210">
                     </div>
                     <div class="form-group">
                         <label>Interested Program</label>
-                        <select required>
+                        <select id="contactProgram" required>
                             <option value="">Select a program</option>
-                            <option value="sainik">Sainik School Coaching</option>
-                            <option value="rms">RMS & Navodaya</option>
-                            <option value="regular">Regular School</option>
-                            <option value="all">All Programs</option>
+                            <option value="Sainik School Coaching">Sainik School Coaching</option>
+                            <option value="RMS & Navodaya">RMS & Navodaya</option>
+                            <option value="Regular School">Regular School</option>
+                            <option value="All Programs">All Programs</option>
                         </select>
                     </div>
                     <div class="form-group">
                         <label>Your Message</label>
-                        <textarea required placeholder="Tell us about your requirements..."></textarea>
+                        <textarea id="contactMessage" required placeholder="Tell us about your requirements..."></textarea>
                     </div>
-                    <button type="submit" class="submit-btn" data-magnetic>
-                        <span>Send Message</span>
-                        <i class="ri-send-plane-line"></i>
+                    <button type="submit" id="contactSubmitBtn" class="submit-btn" data-magnetic>
+                        <span id="contactSubmitText">Send Message</span>
+                        <i class="ri-send-plane-line" id="contactSubmitIcon"></i>
                     </button>
                 </form>
             </div>

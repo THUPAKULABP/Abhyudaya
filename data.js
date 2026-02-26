@@ -1,4 +1,10 @@
 const DEFAULT_SITE_DATA = {
+    announcement: {
+        enabled: false,
+        text: "Admissions open for Academic Year 2026-2027! Limited seats available.",
+        link: "#contact",
+        linkText: "Apply Now"
+    },
     hero: {
         badgeText: "Sainik & Navodaya Oriented",
         titleLine1: "SHAPING",

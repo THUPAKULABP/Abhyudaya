@@ -1,6 +1,25 @@
 document.addEventListener('DOMContentLoaded', () => {
     const data = window.SITE_DATA;
 
+    // ANNOUNCEMENTS
+    if (data.announcement && data.announcement.enabled) {
+        const bar = document.getElementById('announcementBar');
+        const textObj = document.getElementById('announcementText');
+        const linkObj = document.getElementById('announcementLink');
+        if (bar && textObj && linkObj && data.announcement.text) {
+            textObj.innerText = data.announcement.text;
+            if (data.announcement.link && data.announcement.linkText) {
+                linkObj.href = data.announcement.link;
+                linkObj.innerText = data.announcement.linkText;
+            } else {
+                linkObj.style.display = 'none';
+            }
+            bar.style.display = 'block';
+
+            gsap.from(bar, { y: -50, opacity: 0, duration: 1, ease: 'power3.out', delay: 2 });
+        }
+    }
+
     // HERO
     const heroTitle1 = document.querySelector('.hero-title .line:nth-child(1) span');
     if (heroTitle1) heroTitle1.innerText = data.hero.titleLine1;
@@ -212,3 +231,66 @@ function closeYoutubeModal() {
         }, 400);
     }
 }
+
+// CONTACT FORM SUBMISSION
+window.submitContactForm = async function (event) {
+    const submitBtn = document.getElementById('contactSubmitBtn');
+    const submitText = document.getElementById('contactSubmitText');
+    const submitIcon = document.getElementById('contactSubmitIcon');
+    const form = document.getElementById('contactForm');
+
+    // Original State
+    const originalText = submitText.innerText;
+    const originalIcon = submitIcon.className;
+
+    // Loading State
+    submitBtn.disabled = true;
+    submitText.innerText = "Sending...";
+    submitIcon.className = "ri-loader-4-line ri-spin";
+
+    const payload = {
+        firstName: document.getElementById('contactFirstName').value,
+        lastName: document.getElementById('contactLastName').value,
+        email: document.getElementById('contactEmail').value,
+        phone: document.getElementById('contactPhone').value,
+        program: document.getElementById('contactProgram').value,
+        message: document.getElementById('contactMessage').value,
+        timestamp: new Date().toISOString()
+    };
+
+    try {
+        const response = await fetch('/api/contact', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) throw new Error("Server rejected the form submission");
+
+        // Success
+        submitText.innerText = "Sent Successfully!";
+        submitIcon.className = "ri-check-line";
+        submitBtn.style.background = "#22c55e"; // Success green
+        form.reset();
+
+        setTimeout(() => {
+            submitText.innerText = originalText;
+            submitIcon.className = originalIcon;
+            submitBtn.style.background = "";
+            submitBtn.disabled = false;
+        }, 5000);
+
+    } catch (e) {
+        console.error(e);
+        submitText.innerText = "Sending Failed. Try WhatsApp! ";
+        submitIcon.className = "ri-error-warning-line";
+        submitBtn.style.background = "#ef4444"; // Error red
+
+        setTimeout(() => {
+            submitText.innerText = originalText;
+            submitIcon.className = originalIcon;
+            submitBtn.style.background = "";
+            submitBtn.disabled = false;
+        }, 4000);
+    }
+};
