@@ -1043,9 +1043,10 @@
             left: 50%;
             transform-origin: left center;
             transform-style: preserve-3d;
-            transition: transform 1.2s cubic-bezier(0.645, 0.045, 0.355, 1);
+            transition: transform 0.8s cubic-bezier(0.645, 0.045, 0.355, 1);
             cursor: pointer;
             z-index: 1;
+            will-change: transform;
         }
 
         .flipbook-page.flipped {
@@ -1947,8 +1948,41 @@
             <a href="#videos">Videos</a>
             <a href="#gallery">Gallery</a>
             <a href="#contact">Contact</a>
+            <button onclick="openSearch()" class="search-nav-btn" title="Search" aria-label="Search">
+                <i class="ri-search-line"></i>
+            </button>
         </div>
     </nav>
+
+    <!-- SEARCH OVERLAY -->
+    <div id="searchOverlay" style="
+        display:none; position:fixed; inset:0; z-index:99999;
+        background:rgba(0,0,0,0.92); backdrop-filter:blur(20px);
+        flex-direction:column; align-items:center;
+        padding: 6rem 1.5rem 2rem;
+        opacity:0; transition: opacity 0.3s;">
+        <button onclick="closeSearch()" style="
+            position:absolute; top:1.5rem; right:2rem;
+            background:rgba(255,255,255,0.08); border:none;
+            color:white; font-size:1.5rem; width:48px; height:48px;
+            border-radius:50%; cursor:pointer; display:flex;
+            align-items:center; justify-content:center;
+            transition:background 0.2s;">
+            <i class="ri-close-line"></i>
+        </button>
+        <div style="width:100%; max-width:640px;">
+            <div style="position:relative; margin-bottom:2rem;">
+                <i class="ri-search-line" style="position:absolute; left:1.25rem; top:50%; transform:translateY(-50%); font-size:1.5rem; color:var(--primary);"></i>
+                <input id="siteSearchInput" type="text" placeholder="Search photos, videos, testimonials..."
+                    oninput="runSiteSearch(this.value)"
+                    style="width:100%; padding:1.1rem 1rem 1.1rem 4rem;
+                    background:rgba(255,255,255,0.07);
+                    border:2px solid rgba(255,107,0,0.5); border-radius:1rem;
+                    color:white; font-size:1.1rem; font-family:inherit; outline:none;">
+            </div>
+            <div id="searchResultsContainer" style="max-height:60vh; overflow-y:auto;"></div>
+        </div>
+    </div>
 
     <!-- HERO -->
     <section class="hero" id="home">
@@ -3018,18 +3052,129 @@
                 const speed = (index + 1) * 20;
                 const xOffset = (0.5 - x) * speed;
                 const yOffset = (0.5 - y) * speed;
-                shape.style.transform = `translate(${xOffset}px, ${yOffset}px)`;
-            });
         });
     </script>
 
-    <!-- Firebase SDK (Compat) -->
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js"></script>
     <script src="firebase-init.js"></script>
 
     <script src="data.js"></script>
     <script src="hydrate.js"></script>
+
+    <!-- Search Overlay Logic -->
+    <style>
+        .search-nav-btn {
+            background: none; border: none; cursor: pointer;
+            color: rgba(255,255,255,0.8); font-size: 1.25rem;
+            padding: 0.5rem; border-radius: 0.5rem;
+            transition: color 0.2s, background 0.2s;
+            display: flex; align-items: center;
+        }
+        .search-nav-btn:hover { color: var(--primary); background: rgba(255,107,0,0.1); }
+        .search-result-item {
+            display: flex; gap: 1rem; align-items: center;
+            padding: 1rem; border-radius: 0.75rem;
+            background: rgba(255,255,255,0.04); margin-bottom: 0.75rem;
+            border: 1px solid rgba(255,255,255,0.07);
+            cursor: pointer; transition: background 0.2s, border-color 0.2s;
+            text-decoration: none; color: white;
+        }
+        .search-result-item:hover { background: rgba(255,107,0,0.1); border-color: rgba(255,107,0,0.4); }
+        .search-result-thumb {
+            width: 64px; height: 48px; object-fit: cover;
+            border-radius: 0.5rem; flex-shrink: 0; background: #222;
+        }
+        .search-tag {
+            font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em;
+            color: var(--primary); font-weight: 700; margin-bottom: 0.2rem;
+        }
+        .search-result-title { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.1rem; }
+        .search-result-sub { font-size: 0.8rem; color: rgba(255,255,255,0.5); }
+    </style>
+    <script>
+        function openSearch() {
+            const overlay = document.getElementById('searchOverlay');
+            overlay.style.display = 'flex';
+            setTimeout(() => { overlay.style.opacity = '1'; }, 10);
+            setTimeout(() => document.getElementById('siteSearchInput').focus(), 100);
+            document.getElementById('searchResultsContainer').innerHTML = `
+                <p style="text-align:center; color:rgba(255,255,255,0.4); font-size:0.9rem; margin-top:1rem;">
+                    <i class="ri-search-line"></i> Type to search galleries, videos, reviews & more...
+                </p>`;
+        }
+        function closeSearch() {
+            const overlay = document.getElementById('searchOverlay');
+            overlay.style.opacity = '0';
+            setTimeout(() => {
+                overlay.style.display = 'none';
+                document.getElementById('siteSearchInput').value = '';
+                document.getElementById('searchResultsContainer').innerHTML = '';
+            }, 300);
+        }
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') closeSearch();
+        });
+
+        function runSiteSearch(query) {
+            const q = query.toLowerCase().trim();
+            const container = document.getElementById('searchResultsContainer');
+            if (!q) {
+                container.innerHTML = `<p style="text-align:center; color:rgba(255,255,255,0.4); font-size:0.9rem; margin-top:1rem;"><i class="ri-search-line"></i> Type to search...</p>`;
+                return;
+            }
+            const data = window.SITE_DATA;
+            const results = [];
+
+            // Gallery
+            (data.gallery || []).forEach(g => {
+                if ((g.title || '').toLowerCase().includes(q) || (g.subtitle || '').toLowerCase().includes(q)) {
+                    results.push({ type: 'Gallery', title: g.title, sub: g.subtitle, thumb: g.image, href: '#gallery' });
+                }
+            });
+            // Videos
+            (data.videos || []).forEach(v => {
+                if ((v.title || '').toLowerCase().includes(q) || (v.subtitle || '').toLowerCase().includes(q) || (v.backTitle || '').toLowerCase().includes(q)) {
+                    const ytId = (v.videoId || '').replace(/.*v=/, '').replace(/.*youtu\.be\//, '');
+                    const thumb = (v.thumbnail && v.thumbnail.trim()) ? v.thumbnail : `https://img.youtube.com/vi/${ytId}/hqdefault.jpg`;
+                    results.push({ type: 'Video', title: v.title, sub: v.subtitle, thumb, href: '#videos' });
+                }
+            });
+            // Testimonials
+            (data.testimonials || []).forEach(t => {
+                if ((t.name || '').toLowerCase().includes(q) || (t.role || '').toLowerCase().includes(q) || (t.text || '').toLowerCase().includes(q)) {
+                    results.push({ type: 'Review', title: t.name, sub: t.role, thumb: null, href: '#testimonials' });
+                }
+            });
+            // Student Life
+            (data.studentLife || []).forEach(s => {
+                if ((s.title || '').toLowerCase().includes(q) || (s.description || '').toLowerCase().includes(q)) {
+                    results.push({ type: 'Student Life', title: s.title, sub: s.description?.slice(0, 60) + '...', thumb: s.image, href: '#students-life' });
+                }
+            });
+            // Programs
+            (data.programs?.cards || []).forEach(p => {
+                if ((p.title || '').toLowerCase().includes(q) || (p.description || '').toLowerCase().includes(q)) {
+                    results.push({ type: 'Program', title: p.title, sub: p.description?.slice(0, 60) + '...', thumb: null, href: '#programs' });
+                }
+            });
+
+            if (!results.length) {
+                container.innerHTML = `<p style="text-align:center; color:rgba(255,255,255,0.4); font-size:0.9rem; margin-top:2rem;">No results found for "<strong>${query}</strong>"</p>`;
+                return;
+            }
+
+            container.innerHTML = results.map(r => `
+                <a href="${r.href}" class="search-result-item" onclick="closeSearch()">
+                    ${r.thumb ? `<img src="${r.thumb}" class="search-result-thumb" alt="${r.title || ''}">` : `<div class="search-result-thumb" style="background:rgba(255,107,0,0.1);display:flex;align-items:center;justify-content:center;"><i class="ri-article-line" style="color:var(--primary);font-size:1.5rem;"></i></div>`}
+                    <div>
+                        <div class="search-tag">${r.type}</div>
+                        <div class="search-result-title">${r.title || ''}</div>
+                        <div class="search-result-sub">${r.sub || ''}</div>
+                    </div>
+                </a>`).join('');
+        }
+    </script>
 </body>
 
 </html>

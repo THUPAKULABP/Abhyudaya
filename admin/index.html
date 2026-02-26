@@ -506,6 +506,12 @@
         <div class="header">
             <h1 id="pageTitle">Hero Section</h1>
             <div class="header-actions">
+                <!-- Sort toggle: shown only on sortable sections -->
+                <button class="btn-primary" id="sortToggleBtn" onclick="toggleSort()"
+                    style="display:none; background:rgba(212,175,55,0.15); border:1px solid rgba(212,175,55,0.4); color:#d4af37;"
+                    title="Toggle newest-first / original order">
+                    <i class="ri-sort-desc" id="sortIcon"></i> <span id="sortLabel">Newest First</span>
+                </button>
                 <button class="btn-primary" onclick="window.location.reload()"
                     style="background:transparent; border: 1px solid var(--border);">
                     <i class="ri-refresh-line"></i> Discard
@@ -513,6 +519,18 @@
                 <button class="btn-primary" onclick="saveData()">
                     <i class="ri-save-line"></i> Save Changes
                 </button>
+            </div>
+        </div>
+        <!-- Admin Search bar -->
+        <div style="padding: 0.75rem 2rem; border-bottom: 1px solid var(--border); background: rgba(17,17,17,0.5);">
+            <div style="position:relative; max-width:400px;">
+                <i class="ri-search-line" style="position:absolute; left:1rem; top:50%; transform:translateY(-50%); color:rgba(255,255,255,0.4);"></i>
+                <input type="text" id="adminSearch" placeholder="Search fields in this section..."
+                    oninput="adminSearchFilter(this.value)"
+                    style="width:100%; padding:0.65rem 1rem 0.65rem 2.75rem;
+                           background:rgba(255,255,255,0.04); border:1px solid var(--border);
+                           border-radius:0.75rem; color:white; font-family:inherit; font-size:0.9rem; outline:none;
+                           transition: border-color 0.3s;">
             </div>
         </div>
         <div class="content" id="contentArea">
@@ -910,24 +928,64 @@
             }
         };
 
+        // SORTABLE SECTIONS
+        const SORTABLE_SECTIONS = ['testimonials', 'studentLife', 'videos', 'gallery', 'stats'];
+        let currentSortNewest = false;
+        let currentSectionId = 'hero';
+
         function loadSection(id, title) {
-            pageTitle.innerText = title;
+            currentSectionId = id;
+            currentSortNewest = false;
+
+            // Show/hide sort button
+            const sortBtn = document.getElementById('sortToggleBtn');
+            if (sortBtn) {
+                sortBtn.style.display = SORTABLE_SECTIONS.includes(id) ? 'flex' : 'none';
+                document.getElementById('sortLabel').innerText = 'Newest First';
+                document.getElementById('sortIcon').className = 'ri-sort-desc';
+            }
+
+            // Clear admin search
+            const searchInput = document.getElementById('adminSearch');
+            if (searchInput) searchInput.value = '';
+
+            pageTitle.innerText = title.trim();
             contentArea.innerHTML = `<div class="section-panel active">${sections[id]()}</div>`;
 
-            if (id === 'contactSubmissions') {
-                fetchSubmissions();
+            if (id === 'contactSubmissions') fetchSubmissions();
+        }
+
+        function toggleSort() {
+            currentSortNewest = !currentSortNewest;
+            const label = document.getElementById('sortLabel');
+            const icon = document.getElementById('sortIcon');
+            label.innerText = currentSortNewest ? 'Original Order' : 'Newest First';
+            icon.className = currentSortNewest ? 'ri-sort-asc' : 'ri-sort-desc';
+
+            // Reverse the relevant array in STATE temporarily for rendering
+            const arrayMap = {
+                testimonials: 'testimonials',
+                studentLife: 'studentLife',
+                videos: 'videos',
+                gallery: 'gallery',
+                stats: 'stats'
+            };
+            const key = arrayMap[currentSectionId];
+            if (key && STATE[key]) {
+                STATE[key].reverse();
+                contentArea.innerHTML = `<div class="section-panel active">${sections[currentSectionId]()}</div>`;
             }
         }
 
-        // Nav click logic
-        document.querySelectorAll('.nav-item').forEach(item => {
-            if (!item.hasAttribute('data-target')) return;
-            item.addEventListener('click', (e) => {
-                document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-                item.classList.add('active');
-                loadSection(item.getAttribute('data-target'), item.innerText);
+        // Admin Search Filter
+        function adminSearchFilter(query) {
+            const q = query.toLowerCase().trim();
+            const editors = contentArea.querySelectorAll('.card-editor');
+            editors.forEach(editor => {
+                const text = editor.innerText.toLowerCase();
+                editor.style.display = (!q || text.includes(q)) ? '' : 'none';
             });
-        });
+        }
 
         // Save logic
         function saveData() {
@@ -935,6 +993,16 @@
             alert('Changes saved successfully! If Firebase is initialized, it is automatically synced.\n\nYou can now View Website to see the changes.\nOptionally, click OK to download the data.js file.');
             exportData();
         }
+
+        // Nav click logic
+        document.querySelectorAll('.nav-item').forEach(item => {
+            if (!item.hasAttribute('data-target')) return;
+            item.addEventListener('click', () => {
+                document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+                item.classList.add('active');
+                loadSection(item.getAttribute('data-target'), item.innerText);
+            });
+        });
 
         async function checkSubmissionsAlert() {
             if (window.firebaseInitPromise) await window.firebaseInitPromise;
