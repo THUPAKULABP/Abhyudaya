@@ -85,15 +85,35 @@ const DEFAULT_SITE_DATA = {
 
 window.SITE_DATA = JSON.parse(localStorage.getItem('abhyudaya_data')) || DEFAULT_SITE_DATA;
 
+window.loadDataFromFirebase = async function () {
+    if (window.db && typeof firebaseConfig !== 'undefined' && !firebaseConfig.apiKey.includes('YOUR_API')) {
+        try {
+            const snapshot = await window.db.ref('siteData').once('value');
+            if (snapshot.exists()) {
+                const data = snapshot.val();
+                window.SITE_DATA = data;
+                localStorage.setItem('abhyudaya_data', JSON.stringify(data));
+                return data;
+            }
+        } catch (e) {
+            console.warn("Failed to read from Firebase. Using local storage.", e);
+        }
+    }
+    return JSON.parse(localStorage.getItem('abhyudaya_data')) || DEFAULT_SITE_DATA;
+};
+
 function saveSiteData(data) {
     localStorage.setItem('abhyudaya_data', JSON.stringify(data));
     window.SITE_DATA = data;
+    if (window.db && typeof firebaseConfig !== 'undefined' && !firebaseConfig.apiKey.includes('YOUR_API')) {
+        window.db.ref('siteData').set(data).catch(e => console.error("Firebase save error:", e));
+    }
 }
 
 function exportData() {
     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(window.SITE_DATA, null, 4));
     const downloadAnchorNode = document.createElement('a');
-    downloadAnchorNode.setAttribute("href",     dataStr);
+    downloadAnchorNode.setAttribute("href", dataStr);
     downloadAnchorNode.setAttribute("download", "abhyudaya_data.json");
     document.body.appendChild(downloadAnchorNode); // required for firefox
     downloadAnchorNode.click();

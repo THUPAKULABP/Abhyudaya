@@ -1,4 +1,7 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    if (window.loadDataFromFirebase) {
+        window.SITE_DATA = await window.loadDataFromFirebase();
+    }
     const data = window.SITE_DATA;
 
     // ANNOUNCEMENTS
@@ -259,13 +262,11 @@ window.submitContactForm = async function (event) {
     };
 
     try {
-        const response = await fetch('/api/contact', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        });
+        if (!window.db || (typeof firebaseConfig !== 'undefined' && firebaseConfig.apiKey.includes('YOUR_API'))) {
+            throw new Error("Firebase is not initialized or invalid config");
+        }
 
-        if (!response.ok) throw new Error("Server rejected the form submission");
+        await window.db.ref('contact_submissions').push(payload);
 
         // Success
         submitText.innerText = "Sent Successfully!";

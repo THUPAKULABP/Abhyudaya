@@ -14,6 +14,11 @@
     <!-- Icons -->
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 
+    <!-- Firebase SDK (Compat) -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js"></script>
+    <script src="../firebase-init.js"></script>
+
     <!-- Load Data -->
     <script src="../data.js"></script>
 
@@ -659,30 +664,24 @@
         async function fetchSubmissions() {
             const container = document.getElementById('submissionsContent');
             try {
-                // Fetch using Admin Key
-                const authKey = localStorage.getItem('imagekit_private_key') || prompt("Admin authorization is required. Please enter your Admin Password (IMAGEKIT_PRIVATE_KEY):");
-                if (!authKey) {
-                    container.innerHTML = "<p>Authorization required to view submissions.</p>";
+                if (!window.db || (typeof firebaseConfig !== 'undefined' && firebaseConfig.apiKey.includes("YOUR_"))) {
+                    container.innerHTML = "<p style='text-align:center;'>Database is not configured. Please add your config into firebase-init.js</p>";
                     return;
                 }
 
-                // Keep the key in localStorage for convenience since ImageKit uploader uses it too
-                localStorage.setItem('imagekit_private_key', authKey.trim());
+                const snapshot = await window.db.ref('contact_submissions').once('value');
 
-                const response = await fetch('/api/contact', {
-                    headers: { 'Authorization': 'Bearer ' + authKey.trim() }
-                });
-
-                if (!response.ok) {
-                    throw new Error("Unauthorized or Error fetching records.");
-                }
-
-                const data = await response.json();
-
-                if (data.length === 0) {
+                if (!snapshot.exists()) {
                     container.innerHTML = "<p style='text-align:center; color:rgba(255,255,255,0.7);'>No form submissions found.</p>";
                     return;
                 }
+
+                const data = [];
+                snapshot.forEach(child => {
+                    data.push({ id: child.key, ...child.val() });
+                });
+
+                data.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
 
                 container.innerHTML = data.map(sub => `
                     <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 0.5rem; padding: 1.5rem; margin-bottom: 1rem; position: relative;">
@@ -704,22 +703,16 @@
 
             } catch (err) {
                 console.error(err);
-                container.innerHTML = `<p style="color: #ef4444; text-align:center;">${err.message}.<br><br>If you didn't configure your Cloudflare KV Database yet, please refer to the deployment steps provided.</p>`;
+                container.innerHTML = `<p style="color: #ef4444; text-align:center;">${err.message}.<br><br>Ensure Firebase is initialized correctly.</p>`;
             }
         }
 
         window.deleteSubmission = async function (id) {
             if (!confirm("Are you sure you want to delete this submission?")) return;
             try {
-                const authKey = localStorage.getItem('imagekit_private_key');
-                const response = await fetch('/api/contact?id=' + encodeURIComponent(id), {
-                    method: 'DELETE',
-                    headers: { 'Authorization': 'Bearer ' + authKey }
-                });
-                if (response.ok) {
+                if (window.db) {
+                    await window.db.ref('contact_submissions/' + id).remove();
                     fetchSubmissions(); // reload
-                } else {
-                    alert("Failed to delete.");
                 }
             } catch (err) {
                 alert("Error: " + err.message);
@@ -747,8 +740,8 @@
 
         // Save logic
         function saveData() {
-            localStorage.setItem('abhyudaya_data', JSON.stringify(STATE));
-            alert('Changes saved successfully to browser storage! You can now View Website to see the changes.\n\nOptionally, you can click OK to download the data.js file to keep changes permanently in your code.');
+            window.saveSiteData(STATE);
+            alert('Changes saved successfully! If Firebase is initialized, it is automatically synced.\n\nYou can now View Website to see the changes.\nOptionally, click OK to download the data.js file.');
             exportData();
         }
 
@@ -766,7 +759,17 @@
         }
 
         // Load initially
-        loadSection('hero', 'Hero Section');
+        async function initAdmin() {
+            if (window.loadDataFromFirebase) {
+                contentArea.innerHTML = `<div style="text-align:center; padding: 2rem;"><i class="ri-loader-4-line ri-spin" style="font-size: 2rem; color: var(--primary);"></i><p style="margin-top:1rem; color: var(--secondary);">Syncing data from Firebase...</p></div>`;
+                window.SITE_DATA = await window.loadDataFromFirebase();
+            }
+            // Update the global STATE object that all the form inputs bind to
+            Object.assign(STATE, window.SITE_DATA);
+            loadSection('hero', 'Hero Section');
+        }
+
+        initAdmin();
     </script>
 </body>
 
