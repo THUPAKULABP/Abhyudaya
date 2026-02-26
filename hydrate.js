@@ -177,6 +177,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             methods[2].querySelector('p').innerText = data.contact.email;
         }
         if (methods[3]) {
+            methods[3].href = data.contact.mapUrl || '#';
             methods[3].querySelector('p').innerText = data.contact.address;
         }
     }

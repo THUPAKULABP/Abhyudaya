@@ -79,6 +79,7 @@ const DEFAULT_SITE_DATA = {
         whatsapp: "917013509107",
         email: "info@abhyudayaschool.com",
         address: "Madanapalle, Andhra Pradesh",
+        mapUrl: "https://maps.google.com/?q=Madanapalle,+Andhra+Pradesh",
         locationDesc: "Have questions about admissions, programs, or facilities? We'd love to hear from you. Reach out and we'll respond as soon as possible."
     }
 };
