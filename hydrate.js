@@ -104,15 +104,19 @@ function hydrateAnnouncement(data) {
     const textObj = document.getElementById('announcementText');
     const linkObj = document.getElementById('announcementLink');
     if (!bar || !textObj || !linkObj || !data.announcement.text) return;
+    
+    bar.className = `theme-${data.announcement.theme || 'classic'}`;
     textObj.innerText = data.announcement.text;
+    
     if (data.announcement.link && data.announcement.linkText) {
         linkObj.href = data.announcement.link;
-        linkObj.innerText = data.announcement.linkText;
+        linkObj.querySelector('span').innerText = data.announcement.linkText;
+        linkObj.style.display = 'inline-flex';
     } else {
         linkObj.style.display = 'none';
     }
-    bar.style.display = 'block';
-    if (window.gsap) gsap.from(bar, { y: -50, opacity: 0, duration: 1, ease: 'power3.out', delay: 2 });
+    
+    bar.style.display = 'flex';
 }
 
 function hydrateHero(data) {

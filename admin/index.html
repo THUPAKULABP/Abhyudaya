@@ -564,6 +564,15 @@
                 </label>
             </div>
         `;
+        
+        const renderSelect = (label, path, value, options) => `
+            <div class="form-group">
+                <label>${label}</label>
+                <select class="form-control" onchange="updateState('${path}', this.value)" style="background:var(--dark); color:white; cursor:pointer; width:100%; border:1px solid rgba(255,107,0,0.3);">
+                    ${options.map(o => `<option value="${o.value}" ${value === o.value ? 'selected' : ''}>${o.label}</option>`).join('')}
+                </select>
+            </div>
+        `;
 
         const renderImageUploader = (label, path, value, idPrefix) => `
             <div class="form-group">
@@ -703,6 +712,16 @@
                     <h3>Top Banner Announcement</h3>
                     <p style="color: rgba(255,255,255,0.6); margin-bottom: 2rem; font-size: 0.9rem;">Turn this on to display a prominent flash notice across the top of the website. Useful for Admissions, Holidays, or Breaking News.</p>
                     ${renderToggle('Enable Announcement Banner?', 'announcement.enabled', STATE.announcement?.enabled || false)}
+                    ${renderSelect('Flash Notice Theme / Style', 'announcement.theme', STATE.announcement?.theme || 'classic', [
+                        {value: 'classic', label: 'Classic Abhyudaya (Orange Gradient, Bold & Energetic)'},
+                        {value: 'deep-blue', label: 'Deep Blue Professional (Trustworthy & Corporate)'},
+                        {value: 'ruby-red', label: 'Ruby Red Alert (Urgent Holidays or Breaking News)'},
+                        {value: 'emerald-green', label: 'Emerald Green Success (Positive News & Admissions)'},
+                        {value: 'gold-premium', label: 'Gold Premium (Prestigious & Elegant)'},
+                        {value: 'cyber-neon', label: 'Cyber Neon (Modern & Trendy)'},
+                        {value: 'soft-pearl', label: 'Soft Pearl (Minimalist & Clean)'},
+                        {value: 'electric-purple', label: 'Electric Purple (Creative & Dynamic design)'}
+                    ])}
                     ${renderInput('Announcement Text', 'announcement.text', STATE.announcement?.text || "")}
                     ${renderInput('Button Link (e.g. #contact or https://...)', 'announcement.link', STATE.announcement?.link || "")}
                     ${renderInput('Button Text (e.g. Apply Now)', 'announcement.linkText', STATE.announcement?.linkText || "")}

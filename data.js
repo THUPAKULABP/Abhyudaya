@@ -1,6 +1,7 @@
 const DEFAULT_SITE_DATA = {
     announcement: {
         enabled: false,
+        theme: "classic",
         text: "Admissions open for Academic Year 2026-2027! Limited seats available.",
         link: "#contact",
         linkText: "Apply Now"

@@ -181,6 +181,101 @@
             }
         }
 
+        /* ANNOUNCEMENT FLASH BAR */
+        #announcementBar {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 99999;
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-family: 'Inter', sans-serif;
+            border-bottom: 1px solid var(--ab-border);
+            box-shadow: 0 4px 30px var(--ab-glow);
+            background: var(--ab-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            animation: slideDownFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            overflow: hidden;
+        }
+
+        /* Themes */
+        #announcementBar.theme-classic { --ab-bg: rgba(255, 107, 0, 0.95); --ab-border: rgba(255,107,0,1); --ab-glow: rgba(255,107,0,0.5); --ab-text: #fff; --ab-btn-bg: rgba(0,0,0,0.4); --ab-btn-hover: rgba(0,0,0,0.6); --ab-pulse: #fff; }
+        #announcementBar.theme-deep-blue { --ab-bg: rgba(15, 23, 42, 0.95); --ab-border: rgba(56, 189, 248, 0.3); --ab-glow: rgba(14, 165, 233, 0.5); --ab-text: #e0f2fe; --ab-btn-bg: rgba(56, 189, 248, 0.2); --ab-btn-hover: rgba(56, 189, 248, 0.4); --ab-pulse: #38bdf8; }
+        #announcementBar.theme-ruby-red { --ab-bg: rgba(153, 27, 27, 0.95); --ab-border: rgba(248, 113, 113, 0.3); --ab-glow: rgba(220, 38, 38, 0.5); --ab-text: #fee2e2; --ab-btn-bg: rgba(0,0,0,0.3); --ab-btn-hover: rgba(0,0,0,0.5); --ab-pulse: #f87171; }
+        #announcementBar.theme-emerald-green { --ab-bg: rgba(6, 78, 59, 0.95); --ab-border: rgba(52, 211, 153, 0.3); --ab-glow: rgba(16, 185, 129, 0.5); --ab-text: #d1fae5; --ab-btn-bg: rgba(255,255,255,0.15); --ab-btn-hover: rgba(255,255,255,0.25); --ab-pulse: #34d399; }
+        #announcementBar.theme-gold-premium { --ab-bg: linear-gradient(90deg, #111 0%, #2a2200 40%, #111 100%); --ab-border: rgba(212, 175, 55, 0.5); --ab-glow: rgba(212, 175, 55, 0.3); --ab-text: #fef08a; --ab-btn-bg: rgba(212, 175, 55, 0.2); --ab-btn-hover: rgba(212, 175, 55, 0.4); --ab-pulse: #d4af37; }
+        #announcementBar.theme-cyber-neon { --ab-bg: rgba(0, 0, 0, 0.95); --ab-border: #00ff00; --ab-glow: rgba(0, 255, 0, 0.4); --ab-text: #00ff00; --ab-btn-bg: rgba(0, 255, 0, 0.1); --ab-btn-hover: rgba(0, 255, 0, 0.2); --ab-pulse: #00ff00; font-family: 'Syne', sans-serif; text-transform: uppercase; }
+        #announcementBar.theme-soft-pearl { --ab-bg: rgba(255, 255, 255, 0.95); --ab-border: rgba(0,0,0,0.1); --ab-glow: rgba(0,0,0,0.1); --ab-text: #111; --ab-btn-bg: rgba(0,0,0,0.05); --ab-btn-hover: rgba(0,0,0,0.1); --ab-pulse: var(--primary); }
+        #announcementBar.theme-electric-purple { --ab-bg: linear-gradient(135deg, #4c1d95 0%, #1e1b4b 100%); --ab-border: #c084fc; --ab-glow: rgba(168, 85, 247, 0.6); --ab-text: #e9d5ff; --ab-btn-bg: rgba(192, 132, 252, 0.2); --ab-btn-hover: rgba(192, 132, 252, 0.4); --ab-pulse: #c084fc; }
+
+        @keyframes slideDownFade {
+            0% { transform: translateY(-100%); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+
+        .announcement-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            width: 100%;
+        }
+
+        .announcement-pulse {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: var(--ab-pulse);
+            box-shadow: 0 0 10px var(--ab-pulse);
+            animation: pulseGlow 2s infinite;
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.5); opacity: 0.5; }
+        }
+
+        .announcement-text {
+            color: var(--ab-text);
+            font-weight: 600;
+            font-size: 0.9rem;
+            letter-spacing: 0.5px;
+            margin: 0;
+            text-align: center;
+        }
+
+        .announcement-btn {
+            display: inline-flex; align-items: center; gap: 0.4rem;
+            padding: 0.35rem 0.8rem;
+            background: var(--ab-btn-bg);
+            color: var(--ab-text);
+            text-decoration: none;
+            border-radius: 100px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            transition: all 0.3s;
+            border: 1px solid var(--ab-border);
+        }
+        .announcement-btn:hover {
+            background: var(--ab-btn-hover);
+            transform: scale(1.05);
+        }
+
+        .announcement-close {
+            background: transparent;
+            border: none;
+            color: var(--ab-text);
+            font-size: 1.25rem;
+            cursor: pointer;
+            opacity: 0.6;
+            transition: opacity 0.3s;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .announcement-close:hover { opacity: 1; }
+
+
         /* BACKGROUND EFFECTS */
         .gradient-mesh {
             position: fixed;
@@ -1989,6 +2084,20 @@
             </div>
             <div id="searchResultsContainer" style="max-height:60vh; overflow-y:auto;"></div>
         </div>
+    </div>
+
+    <!-- FLASH ANNOUNCEMENT -->
+    <div id="announcementBar" class="theme-classic" style="display:none;">
+        <div class="announcement-content">
+            <div class="announcement-pulse"></div>
+            <p id="announcementText" class="announcement-text"></p>
+            <a id="announcementLink" href="#" class="announcement-btn">
+                <span>View</span> <i class="ri-arrow-right-line"></i>
+            </a>
+        </div>
+        <button class="announcement-close" onclick="document.getElementById('announcementBar').style.display='none'">
+            <i class="ri-close-line"></i>
+        </button>
     </div>
 
     <!-- HERO -->
