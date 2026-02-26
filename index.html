@@ -1691,10 +1691,15 @@
             background: linear-gradient(135deg, rgba(255, 107, 0, 0.15), rgba(212, 175, 55, 0.15));
             border: 2px solid rgba(255, 107, 0, 0.3);
             border-radius: 2rem;
-            padding: 2.5rem;
+            padding: 2rem 1.5rem;
             text-align: center;
             backdrop-filter: blur(10px);
             transition: all 0.4s;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
         }
 
         .stat-card:hover {
@@ -1705,7 +1710,7 @@
 
         .stat-number {
             font-family: 'Syne', sans-serif;
-            font-size: 3rem;
+            font-size: clamp(2rem, 10vw, 3.5rem);
             font-weight: 800;
             background: linear-gradient(135deg, var(--primary), var(--secondary));
             -webkit-background-clip: text;
@@ -1713,9 +1718,11 @@
             background-clip: text;
             margin-bottom: 0.75rem;
             line-height: 1;
-            white-space: nowrap;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            word-break: break-word;
             display: inline-block;
-            min-width: 100px;
+            max-width: 100%;
         }
 
         .stat-label {
