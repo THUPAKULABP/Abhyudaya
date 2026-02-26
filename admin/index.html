@@ -664,8 +664,9 @@
         async function fetchSubmissions() {
             const container = document.getElementById('submissionsContent');
             try {
-                if (!window.db || (typeof firebaseConfig !== 'undefined' && firebaseConfig.apiKey.includes("YOUR_"))) {
-                    container.innerHTML = "<p style='text-align:center;'>Database is not configured. Please add your config into firebase-init.js</p>";
+                if (window.firebaseInitPromise) await window.firebaseInitPromise;
+                if (!window.db) {
+                    container.innerHTML = "<p style='text-align:center;'>Database is not configured in Cloudflare Environment Variables. Please set up the FIREBASE variables.</p>";
                     return;
                 }
 

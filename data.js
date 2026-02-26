@@ -86,7 +86,8 @@ const DEFAULT_SITE_DATA = {
 window.SITE_DATA = JSON.parse(localStorage.getItem('abhyudaya_data')) || DEFAULT_SITE_DATA;
 
 window.loadDataFromFirebase = async function () {
-    if (window.db && typeof firebaseConfig !== 'undefined' && !firebaseConfig.apiKey.includes('YOUR_API')) {
+    if (window.firebaseInitPromise) await window.firebaseInitPromise;
+    if (window.db) {
         try {
             const snapshot = await window.db.ref('siteData').once('value');
             if (snapshot.exists()) {
@@ -102,10 +103,11 @@ window.loadDataFromFirebase = async function () {
     return JSON.parse(localStorage.getItem('abhyudaya_data')) || DEFAULT_SITE_DATA;
 };
 
-function saveSiteData(data) {
+async function saveSiteData(data) {
     localStorage.setItem('abhyudaya_data', JSON.stringify(data));
     window.SITE_DATA = data;
-    if (window.db && typeof firebaseConfig !== 'undefined' && !firebaseConfig.apiKey.includes('YOUR_API')) {
+    if (window.firebaseInitPromise) await window.firebaseInitPromise;
+    if (window.db) {
         window.db.ref('siteData').set(data).catch(e => console.error("Firebase save error:", e));
     }
 }

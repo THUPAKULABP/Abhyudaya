@@ -262,7 +262,8 @@ window.submitContactForm = async function (event) {
     };
 
     try {
-        if (!window.db || (typeof firebaseConfig !== 'undefined' && firebaseConfig.apiKey.includes('YOUR_API'))) {
+        if (window.firebaseInitPromise) await window.firebaseInitPromise;
+        if (!window.db) {
             throw new Error("Firebase is not initialized or invalid config");
         }
 
