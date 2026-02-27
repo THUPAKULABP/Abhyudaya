@@ -107,7 +107,14 @@ function hydrateAnnouncement(data) {
     const ann = data.announcement || {};
     // Treat 'true' string as boolean true
     const isEnabled = ann.enabled === true || ann.enabled === 'true';
-    if (!isEnabled) return;
+
+    if (!isEnabled) {
+        const bar = document.getElementById('announcementBar');
+        if (bar) bar.style.display = 'none';
+        const nav = document.getElementById('navbar');
+        if (nav) nav.style.top = '0';
+        return;
+    }
 
     const bar = document.getElementById('announcementBar');
     const textObj = document.getElementById('announcementText');
@@ -127,6 +134,15 @@ function hydrateAnnouncement(data) {
     }
 
     bar.style.display = 'flex';
+
+    // Push the navbar down by the height of the announcement bar
+    setTimeout(() => {
+        const nav = document.getElementById('navbar');
+        if (nav) {
+            nav.style.top = bar.offsetHeight + 'px';
+            nav.style.transition = 'top 0.3s ease, padding 0.3s, background 0.3s';
+        }
+    }, 50);
 }
 
 function hydrateHero(data) {
